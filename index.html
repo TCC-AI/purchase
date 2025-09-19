@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>昶青實業採購課系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        /* ===== CSS 樣式 ===== */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* 登入頁面樣式 */
+        .login-page {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .login-card .card-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            border-bottom: none;
+        }
+
+        .login-card .card-body {
+            padding: 2rem;
+        }
+
+        /* 主系統樣式 */
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary-color);
+            color: white;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .stat-card {
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-group-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.75em;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .form-floating label {
+            color: #6c757d;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            
+            .sidebar.show {
+                margin-left: 0;
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        /* 隱藏類別 */
+        .d-none {
+            display: none !important;
+        }
+
+        /* 載入動畫 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== 登入頁面 ===== -->
+    <div id="loginPage" class="login-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card login-card">
+                        <div class="card-header text-center">
+                            <h3><i class="fas fa-shopping-cart me-2"></i>昶青實業採購課系統</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="loginForm">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="userId" placeholder="使用者帳號" required>
+                                    <label for="userId">使用者帳號</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="password" placeholder="密碼" required>
+                                    <label for="password">密碼</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fas fa-sign-in-alt me-2"></i>登入
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 主系統頁面 ===== -->
+    <div id="mainSystem" class="d-none">
+        <div class="wrapper">
+            <!-- 側邊欄 -->
+            <nav id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <h4><i class="fas fa-shopping-cart me-2"></i>採購課系統</h4>
+                    <small id="userInfo">使用者：</small>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>儀表板
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="purchase-orders">
+                            <i class="fas fa-file-invoice me-2"></i>採購管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="vendors">
+                            <i class="fas fa-building me-2"></i>廠商管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="quotations">
+                            <i class="fas fa-calculator me-2"></i>報價管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="reports">
+                            <i class="fas fa-chart-bar me-2"></i>報表分析
+                        </a>
+                    </li>
+                    <li class="nav-item mt-auto">
+                        <a class="nav-link" href="#" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt me-2"></i>登出
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 主要內容區域 -->
+            <div id="content" class="content">
+                <!-- 儀表板頁面 -->
+                <div id="dashboardPage" class="page-content">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h2><i class="fas fa-tachometer-alt me-2"></i>儀表板</h2>
+                                <p class="text-muted">採購課系統總覽</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 統計卡片 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="card stat-card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-file-alt fa-2x text-primary mb-2"></i>
+                                        <h5 class="card-title">本月採購案件</h5>
+                                        <h3 class="text-primary" id="monthlyOrders">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stat-card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                        <h5 class="card-title">待處理案件</h5>
+                                        <h3 class="text-warning" id="pendingOrders">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stat-card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                                        <h5 class="card-title">本月採購金額</h5>
+                                        <h3 class="text-success" id="monthlyAmount">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stat-card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-building fa-2x text-info mb-2"></i>
+                                        <h5 class="card-title">合格廠商數</h5>
+                                        <h3 class="text-info" id="vendorCount">-</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 圖表區域 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-chart-pie me-2"></i>採購金額分級統計</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="amountLevelChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-chart-donut me-2"></i>採購狀態分布</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="statusChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最新採購案件 -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5><i class="fas fa-list me-2"></i>最新採購案件</h5>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="showPage('purchase-orders')">
+                                            查看全部
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover" id="recentOrdersTable">
+                                                <thead class="table-dark">
+                                                    <tr>
+                                                        <th>採購編號</th>
+                                                        <th>請購日期</th>
+                                                        <th>請購單位</th>
+                                                        <th>採購項目</th>
+                                                        <th>預估金額</th>
+                                                        <th>狀態</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="6" class="text-center">載入中...</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 採購管理頁面 -->
+                <div id="purchaseOrdersPage" class="page-content d-none">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h2><i class="fas fa-file-invoice me-2"></i>採購管理</h2>
+                                <p class="text-muted">管理所有採購案件</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPurchaseModal">
+                                    <i class="fas fa-plus me-2"></i>新增採購案
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 篩選器 -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="statusFilter">
+                                            <option value="">所有狀態</option>
+                                            <option value="請購中">請購中</option>
+                                            <option value="詢價中">詢價中</option>
+                                            <option value="比價中">比價中</option>
+                                            <option value="核准中">核准中</option>
+                                            <option value="已下單">已下單</option>
+                                            <option value="驗收中">驗收中</option>
+                                            <option value="已完成">已完成</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="amountLevelFilter">
+                                            <option value="">所有金額級別</option>
+                                            <option value="小額採購">小額採購</option>
+                                            <option value="一般採購">一般採購</option>
+                                            <option value="重大採購">重大採購</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋採購編號或項目名稱">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-outline-secondary w-100" onclick="applyFilters()">
+                                            <i class="fas fa-search me-2"></i>搜尋
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 採購案件列表 -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="purchaseOrdersTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>採購編號</th>
+                                                <th>請購日期</th>
+                                                <th>請購單位</th>
+                                                <th>採購項目</th>
+                                                <th>預估金額</th>
+                                                <th>金額級別</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="text-center">載入中...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 廠商管理頁面 -->
+                <div id="vendorsPage" class="page-content d-none">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h2><i class="fas fa-building me-2"></i>廠商管理</h2>
+                                <p class="text-muted">管理合格廠商資料</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newVendorModal">
+                                    <i class="fas fa-plus me-2"></i>新增廠商
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 廠商列表 -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="vendorsTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>廠商編號</th>
+                                                <th>廠商名稱</th>
+                                                <th>統一編號</th>
+                                                <th>聯絡人</th>
+                                                <th>電話</th>
+                                                <th>廠商類別</th>
+                                                <th>評等</th>
+                                                <th>狀態</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="9" class="text-center">載入中...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 報價管理頁面 -->
+                <div id="quotationsPage" class="page-content d-none">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h2><i class="fas fa-calculator me-2"></i>報價管理</h2>
+                                <p class="text-muted">管理廠商報價與比價作業</p>
+                            </div>
+                        </div>
+
+                        <!-- 報價列表 -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover" id="quotationsTable">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>報價編號</th>
+                                                <th>採購編號</th>
+                                                <th>廠商名稱</th>
+                                                <th>報價金額</th>
+                                                <th>交期</th>
+                                                <th>報價日期</th>
+                                                <th>是否得標</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="text-center">載入中...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 報表分析頁面 -->
+                <div id="reportsPage" class="page-content d-none">
+                    <div class="container-fluid">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h2><i class="fas fa-chart-bar me-2"></i>報表分析</h2>
+                                <p class="text-muted">採購數據統計與分析</p>
+                            </div>
+                        </div>
+
+                        <!-- 報表內容 -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>月度採購趨勢</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="monthlyTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>部門採購統計</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="departmentChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 模態視窗 ===== -->
+    
+    <!-- 新增採購案模態視窗 -->
+    <div class="modal fade" id="newPurchaseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>新增採購案</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newPurchaseForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="requestingDept" required>
+                                    <label for="requestingDept">請購單位</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="requestingPerson" required>
+                                    <label for="requestingPerson">請購人員</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="category" required>
+                                        <option value="">請選擇</option>
+                                        <option value="設備">設備</option>
+                                        <option value="服務">服務</option>
+                                        <option value="工程">工程</option>
+                                        <option value="其他">其他</option>
+                                    </select>
+                                    <label for="category">採購類別</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" id="estimatedAmount" required>
+                                    <label for="estimatedAmount">預估金額</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="itemName" required>
+                            <label for="itemName">採購項目名稱</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="specification" style="height: 100px" required></textarea>
+                            <label for="specification">規格說明</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="quantity" required>
+                            <label for="quantity">數量</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNewPurchase()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增廠商模態視窗 -->
+    <div class="modal fade" id="newVendorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>新增廠商</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newVendorForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="vendorName" required>
+                                    <label for="vendorName">廠商名稱</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="taxId" required>
+                                    <label for="taxId">統一編號</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="contact" required>
+                                    <label for="contact">聯絡人</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" class="form-control" id="phone" required>
+                                    <label for="phone">電話</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" required>
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="address" style="height: 80px" required></textarea>
+                            <label for="address">地址</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="vendorCategory" required>
+                                <option value="">請選擇</option>
+                                <option value="設備供應商">設備供應商</option>
+                                <option value="服務提供商">服務提供商</option>
+                                <option value="工程承包商">工程承包商</option>
+                                <option value="其他">其他</option>
+                            </select>
+                            <label for="vendorCategory">廠商類別</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitNewVendor()">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script>
+        // ===== JavaScript 代碼 =====
+        
+        // 全域變數
+        let currentUser = null;
+        let currentPage = 'dashboard';
+        let charts = {};
+        
+        // API 配置
+        const API_CONFIG = {
+            baseUrl: 'https://script.google.com/macros/s/AKfycbwnLQQ6sIOtcuBrEc-oLac5sMTiWKYKT45VziYa57O_JzH2LtrEy3sa_CsxJJx-fCfx/exec', // 請替換為實際的 GAS URL
+        };
+
+        // ===== API 服務類別 =====
+        class PurchaseAPI {
+            constructor() {
+                this.baseUrl = API_CONFIG.baseUrl;
+            }
+
+            async get(action, params = {}) {
+                const url = new URL(this.baseUrl);
+                url.searchParams.append('action', action);
+                
+                Object.keys(params).forEach(key => {
+                    if (params[key] !== null && params[key] !== undefined) {
+                        url.searchParams.append(key, params[key]);
+                    }
+                });
+
+                try {
+                    const response = await fetch(url);
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('API GET Error:', error);
+                    this.showError('網路連線錯誤，請稍後再試');
+                    throw error;
+                }
+            }
+
+            async post(action, data) {
+                try {
+                    const response = await fetch(this.baseUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ action, ...data })
+                    });
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('API POST Error:', error);
+                    this.showError('網路連線錯誤，請稍後再試');
+                    throw error;
+                }
+            }
+
+            showError(message) {
+                // 顯示錯誤訊息的通用方法
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+                alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+                
+                // 3秒後自動移除
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 3000);
+            }
+
+            showSuccess(message) {
+                // 顯示成功訊息的通用方法
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 3000);
+            }
+
+            // 具體 API 方法
+            async login(userId, password) {
+                return await this.post('login', { userId, password });
+            }
+
+            async getPurchaseOrders(filters = {}) {
+                return await this.get('getPurchaseOrders', filters);
+            }
+
+            async createPurchaseOrder(orderData) {
+                return await this.post('createPurchaseOrder', orderData);
+            }
+
+            async updatePurchaseOrder(orderId, updateData) {
+                return await this.post('updatePurchaseOrder', { orderId, ...updateData });
+            }
+
+            async getVendors() {
+                return await this.get('getVendors');
+            }
+
+            async addVendor(vendorData) {
+                return await this.post('addVendor', vendorData);
+            }
+
+            async getDashboardData() {
+                return await this.get('getDashboardData');
+            }
+
+            async getQuotations(purchaseId = null) {
+                return await this.get('getQuotations', purchaseId ? { purchaseId } : {});
+            }
+
+            async addQuotation(quotationData) {
+                return await this.post('addQuotation', quotationData);
+            }
+
+            async getReports(reportType) {
+                return await this.get('getReports', { reportType });
+            }
+        }
+
+        // 建立 API 實例
+        const api = new PurchaseAPI();
+
+        // ===== 主要應用程式類別 =====
+        class PurchaseApp {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.checkLoginStatus();
+            }
+
+            bindEvents() {
+                // 登入表單事件
+                document.getElementById('loginForm').addEventListener('submit', this.handleLogin.bind(this));
+                
+                // 登出按鈕事件
+                document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
+                
+                // 側邊欄導航事件
+                document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = e.target.closest('[data-page]').dataset.page;
+                        this.showPage(page);
+                    });
+                });
+
+                // 篩選器事件
+                document.getElementById('statusFilter')?.addEventListener('change', this.applyFilters.bind(this));
+                document.getElementById('amountLevelFilter')?.addEventListener('change', this.applyFilters.bind(this));
+                document.getElementById('searchInput')?.addEventListener('input', this.debounce(this.applyFilters.bind(this), 500));
+            }
+
+            // 防抖函數
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            checkLoginStatus() {
+                // 檢查是否已登入（可以從 localStorage 讀取）
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    this.showMainSystem();
+                } else {
+                    this.showLoginPage();
+                }
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const userId = document.getElementById('userId').value;
+                const password = document.getElementById('password').value;
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                
+                // 顯示載入狀態
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登入中...';
+                submitBtn.disabled = true;
+
+                try {
+                    // 模擬登入驗證（實際應該調用 API）
+                    if (userId && password) {
+                        // 模擬用戶資料
+                        currentUser = {
+                            id: userId,
+                            name: userId === 'admin' ? '系統管理員' : userId,
+                            department: '採購課',
+                            role: userId === 'admin' ? '主任' : '組員',
+                            permissions: userId === 'admin' ? ['all'] : ['read', 'create']
+                        };
+                        
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        this.showMainSystem();
+                        api.showSuccess('登入成功！');
+                    } else {
+                        throw new Error('請輸入帳號和密碼');
+                    }
+                } catch (error) {
+                    api.showError(error.message || '登入失敗，請檢查帳號密碼');
+                } finally {
+                    // 恢復按鈕狀態
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>登入';
+                    submitBtn.disabled = false;
+                }
+            }
+
+            handleLogout() {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                this.showLoginPage();
+                api.showSuccess('已成功登出');
+            }
+
+            showLoginPage() {
+                document.getElementById('loginPage').classList.remove('d-none');
+                document.getElementById('mainSystem').classList.add('d-none');
+                document.body.className = 'login-page';
+            }
+
+            showMainSystem() {
+                document.getElementById('loginPage').classList.add('d-none');
+                document.getElementById('mainSystem').classList.remove('d-none');
+                document.body.className = '';
+                
+                // 更新用戶資訊
+                if (currentUser) {
+                    document.getElementById('userInfo').textContent = `使用者：${currentUser.name} (${currentUser.role})`;
+                }
+                
+                // 載入儀表板
+                this.showPage('dashboard');
+            }
+
+            showPage(pageName) {
+                // 隱藏所有頁面
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.add('d-none');
+                });
+                
+                // 顯示指定頁面
+                const targetPage = document.getElementById(pageName + 'Page');
+                if (targetPage) {
+                    targetPage.classList.remove('d-none');
+                    currentPage = pageName;
+                    
+                    // 更新導航狀態
+                    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    document.querySelector(`[data-page="${pageName}"]`)?.classList.add('active');
+                    
+                    // 載入頁面資料
+                    this.loadPageData(pageName);
+                }
+            }
+
+            async loadPageData(pageName) {
+                try {
+                    switch (pageName) {
+                        case 'dashboard':
+                            await this.loadDashboard();
+                            break;
+                        case 'purchase-orders':
+                            await this.loadPurchaseOrders();
+                            break;
+                        case 'vendors':
+                            await this.loadVendors();
+                            break;
+                        case 'quotations':
+                            await this.loadQuotations();
+                            break;
+                        case 'reports':
+                            await this.loadReports();
+                            break;
+                    }
+                } catch (error) {
+                    console.error(`載入 ${pageName} 頁面資料失敗:`, error);
+                }
+            }
+
+            // ===== 儀表板相關方法 =====
+            async loadDashboard() {
+                try {
+                    // 載入統計資料
+                    const dashboardData = await this.getMockDashboardData();
+                    
+                    document.getElementById('monthlyOrders').textContent = dashboardData.monthlyOrders;
+                    document.getElementById('pendingOrders').textContent = dashboardData.pendingOrders;
+                    document.getElementById('monthlyAmount').textContent = 
+                        new Intl.NumberFormat('zh-TW', { 
+                            style: 'currency', 
+                            currency: 'TWD' 
+                        }).format(dashboardData.monthlyAmount);
+                    document.getElementById('vendorCount').textContent = dashboardData.vendorCount;
+                    
+                    // 初始化圖表
+                    this.initDashboardCharts(dashboardData);
+                    
+                    // 載入最新採購案件
+                    await this.loadRecentOrders();
+                    
+                } catch (error) {
+                    console.error('載入儀表板資料失敗:', error);
+                }
+            }
+
+            async getMockDashboardData() {
+                // 模擬資料，實際應該從 API 獲取
+                return {
+                    monthlyOrders: 25,
+                    pendingOrders: 8,
+                    monthlyAmount: 2850000,
+                    vendorCount: 45,
+                    amountLevelData: [15, 8, 2], // 小額、一般、重大
+                    statusData: [3, 5, 2, 4, 6, 3, 2] // 各狀態數量
+                };
+            }
+
+            initDashboardCharts(data) {
+                // 採購金額分級統計圖
+                const amountLevelCtx = document.getElementById('amountLevelChart');
+                if (amountLevelCtx) {
+                    if (charts.amountLevel) {
+                        charts.amountLevel.destroy();
+                    }
+                    charts.amountLevel = new Chart(amountLevelCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['小額採購 (≤15萬)', '一般採購 (15-100萬)', '重大採購 (>100萬)'],
+                            datasets: [{
+                                data: data.amountLevelData,
+                                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 採購狀態分布圖
+                const statusCtx = document.getElementById('statusChart');
+                if (statusCtx) {
+                    if (charts.status) {
+                        charts.status.destroy();
+                    }
+                    charts.status = new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['請購中', '詢價中', '比價中', '核准中', '已下單', '驗收中', '已完成'],
+                            datasets: [{
+                                data: data.statusData,
+                                backgroundColor: [
+                                    '#007bff', '#6c757d', '#28a745', 
+                                    '#ffc107', '#fd7e14', '#e83e8c', '#20c997'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            async loadRecentOrders() {
+                const tbody = document.querySelector('#recentOrdersTable tbody');
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">載入中...</td></tr>';
+                
+                try {
+                    const orders = await this.getMockPurchaseOrders(5); // 獲取最新 5 筆
+                    tbody.innerHTML = '';
+                    
+                    if (orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">暫無資料</td></tr>';
+                        return;
+                    }
+                    
+                    orders.forEach(order => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${order.purchaseId}</td>
+                            <td>${new Date(order.requestDate).toLocaleDateString('zh-TW')}</td>
+                            <td>${order.requestingDept}</td>
+                            <td>${order.itemName}</td>
+                            <td>${new Intl.NumberFormat('zh-TW', { 
+                                style: 'currency', 
+                                currency: 'TWD' 
+                            }).format(order.estimatedAmount)}</td>
+                            <td><span class="badge bg-${this.getStatusColor(order.status)}">${order.status}</span></td>
+                        `;
+                    });
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">載入失敗</td></tr>';
+                }
+            }
+
+            // ===== 採購管理相關方法 =====
+            async loadPurchaseOrders(filters = {}) {
+                const tbody = document.querySelector('#purchaseOrdersTable tbody');
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">載入中...</td></tr>';
+                
+                try {
+                    const orders = await this.getMockPurchaseOrders();
+                    tbody.innerHTML = '';
+                    
+                    if (orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
+                        return;
+                    }
+                    
+                    orders.forEach(order => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${order.purchaseId}</td>
+                            <td>${new Date(order.requestDate).toLocaleDateString('zh-TW')}</td>
+                            <td>${order.requestingDept}</td>
+                            <td>${order.itemName}</td>
+                            <td>${new Intl.NumberFormat('zh-TW', { 
+                                style: 'currency', 
+                                currency: 'TWD' 
+                            }).format(order.estimatedAmount)}</td>
+                            <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel}</span></td>
+                            <td><span class="badge bg-${this.getStatusColor(order.status)}">${order.status}</span></td>
+                            <td>
+                                <div class="btn-group-actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewPurchaseOrder('${order.purchaseId}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="editPurchaseOrder('${order.purchaseId}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                    });
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">載入失敗</td></tr>';
+                }
+            }
+
+            async getMockPurchaseOrders(limit = null) {
+                // 模擬採購案件資料
+                const mockData = [
+                    {
+                        purchaseId: 'PO20250919001',
+                        requestDate: '2025-09-19',
+                        requestingDept: '資訊部',
+                        requestingPerson: '張小明',
+                        category: '設備',
+                        itemName: '伺服器設備',
+                        estimatedAmount: 850000,
+                        amountLevel: '一般採購',
+                        status: '詢價中'
+                    },
+                    {
+                        purchaseId: 'PO20250918002',
+                        requestDate: '2025-09-18',
+                        requestingDept: '行政部',
+                        requestingPerson: '李小華',
+                        category: '服務',
+                        itemName: '辦公室清潔服務',
+                        estimatedAmount: 120000,
+                        amountLevel: '小額採購',
+                        status: '已完成'
+                    },
+                    {
+                        purchaseId: 'PO20250917003',
+                        requestDate: '2025-09-17',
+                        requestingDept: '工程部',
+                        requestingPerson: '王大明',
+                        category: '工程',
+                        itemName: '廠房改建工程',
+                        estimatedAmount: 1500000,
+                        amountLevel: '重大採購',
+                        status: '核准中'
+                    },
+                    {
+                        purchaseId: 'PO20250916004',
+                        requestDate: '2025-09-16',
+                        requestingDept: '研發部',
+                        requestingPerson: '陳小美',
+                        category: '設備',
+                        itemName: '實驗室設備',
+                        estimatedAmount: 650000,
+                        amountLevel: '一般採購',
+                        status: '比價中'
+                    },
+                    {
+                        purchaseId: 'PO20250915005',
+                        requestDate: '2025-09-15',
+                        requestingDept: '總務部',
+                        requestingPerson: '劉小強',
+                        category: '其他',
+                        itemName: '辦公用品',
+                        estimatedAmount: 85000,
+                        amountLevel: '小額採購',
+                        status: '已下單'
+                    }
+                ];
+                
+                return limit ? mockData.slice(0, limit) : mockData;
+            }
+
+            // ===== 廠商管理相關方法 =====
+            async loadVendors() {
+                const tbody = document.querySelector('#vendorsTable tbody');
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center">載入中...</td></tr>';
+                
+                try {
+                    const vendors = await this.getMockVendors();
+                    tbody.innerHTML = '';
+                    
+                    if (vendors.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">暫無資料</td></tr>';
+                        return;
+                    }
+                    
+                    vendors.forEach(vendor => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${vendor.vendorId}</td>
+                            <td>${vendor.name}</td>
+                            <td>${vendor.taxId}</td>
+                            <td>${vendor.contact}</td>
+                            <td>${vendor.phone}</td>
+                            <td>${vendor.category}</td>
+                            <td><span class="badge bg-${this.getRatingColor(vendor.rating)}">${vendor.rating}</span></td>
+                            <td><span class="badge bg-${vendor.status === '合格' ? 'success' : 'danger'}">${vendor.status}</span></td>
+                            <td>
+                                <div class="btn-group-actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewVendor('${vendor.vendorId}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="editVendor('${vendor.vendorId}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                    });
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">載入失敗</td></tr>';
+                }
+            }
+
+            async getMockVendors() {
+                // 模擬廠商資料
+                return [
+                    {
+                        vendorId: 'V001',
+                        name: '台灣科技股份有限公司',
+                        taxId: '12345678',
+                        contact: '張經理',
+                        phone: '02-1234-5678',
+                        category: '設備供應商',
+                        rating: 'A',
+                        status: '合格'
+                    },
+                    {
+                        vendorId: 'V002',
+                        name: '優質服務有限公司',
+                        taxId: '87654321',
+                        contact: '李主任',
+                        phone: '02-8765-4321',
+                        category: '服務提供商',
+                        rating: 'B',
+                        status: '合格'
+                    },
+                    {
+                        vendorId: 'V003',
+                        name: '建築工程股份有限公司',
+                        taxId: '11223344',
+                        contact: '王工程師',
+                        phone: '02-1122-3344',
+                        category: '工程承包商',
+                        rating: 'A',
+                        status: '合格'
+                    }
+                ];
+            }
+
+            // ===== 報價管理相關方法 =====
+            async loadQuotations() {
+                const tbody = document.querySelector('#quotationsTable tbody');
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">載入中...</td></tr>';
+                
+                try {
+                    const quotations = await this.getMockQuotations();
+                    tbody.innerHTML = '';
+                    
+                    if (quotations.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
+                        return;
+                    }
+                    
+                    quotations.forEach(quotation => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${quotation.quotationId}</td>
+                            <td>${quotation.purchaseId}</td>
+                            <td>${quotation.vendorName}</td>
+                            <td>${new Intl.NumberFormat('zh-TW', { 
+                                style: 'currency', 
+                                currency: 'TWD' 
+                            }).format(quotation.quotedAmount)}</td>
+                            <td>${quotation.deliveryDays} 天</td>
+                            <td>${new Date(quotation.quotationDate).toLocaleDateString('zh-TW')}</td>
+                            <td><span class="badge bg-${quotation.isWinning ? 'success' : 'secondary'}">${quotation.isWinning ? '得標' : '未得標'}</span></td>
+                            <td>
+                                <div class="btn-group-actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewQuotation('${quotation.quotationId}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    ${!quotation.isWinning ? `<button class="btn btn-sm btn-outline-success" onclick="selectWinner('${quotation.quotationId}')">
+                                        <i class="fas fa-check"></i>
+                                    </button>` : ''}
+                                </div>
+                            </td>
+                        `;
+                    });
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">載入失敗</td></tr>';
+                }
+            }
+
+            async getMockQuotations() {
+                // 模擬報價資料
+                return [
+                    {
+                        quotationId: 'Q001',
+                        purchaseId: 'PO20250919001',
+                        vendorName: '台灣科技股份有限公司',
+                        quotedAmount: 820000,
+                        deliveryDays: 30,
+                        quotationDate: '2025-09-19',
+                        isWinning: false
+                    },
+                    {
+                        quotationId: 'Q002',
+                        purchaseId: 'PO20250919001',
+                        vendorName: '另一家科技公司',
+                        quotedAmount: 850000,
+                        deliveryDays: 25,
+                        quotationDate: '2025-09-19',
+                        isWinning: false
+                    },
+                    {
+                        quotationId: 'Q003',
+                        purchaseId: 'PO20250918002',
+                        vendorName: '優質服務有限公司',
+                        quotedAmount: 115000,
+                        deliveryDays: 7,
+                        quotationDate: '2025-09-18',
+                        isWinning: true
+                    }
+                ];
+            }
+
+            // ===== 報表分析相關方法 =====
+            async loadReports() {
+                // 初始化報表圖表
+                this.initReportCharts();
+            }
+
+            initReportCharts() {
+                // 月度採購趨勢圖
+                const monthlyTrendCtx = document.getElementById('monthlyTrendChart');
+                if (monthlyTrendCtx) {
+                    if (charts.monthlyTrend) {
+                        charts.monthlyTrend.destroy();
+                    }
+                    charts.monthlyTrend = new Chart(monthlyTrendCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月'],
+                            datasets: [{
+                                label: '採購金額 (萬元)',
+                                data: [150, 200, 180, 220, 190, 250, 280, 260, 285],
+                                borderColor: '#007bff',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 部門採購統計圖
+                const departmentCtx = document.getElementById('departmentChart');
+                if (departmentCtx) {
+                    if (charts.department) {
+                        charts.department.destroy();
+                    }
+                    charts.department = new Chart(departmentCtx, {                        type: 'bar',
+                        data: {
+                            labels: ['資訊部', '工程部', '研發部', '行政部', '總務部'],
+                            datasets: [{
+                                label: '採購金額 (萬元)',
+                                data: [85, 150, 65, 45, 35],
+                                backgroundColor: [
+                                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'
+                                ],
+                                borderColor: [
+                                    '#0056b3', '#1e7e34', '#d39e00', '#bd2130', '#545b62'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // ===== 工具方法 =====
+            getStatusColor(status) {
+                const colorMap = {
+                    '請購中': 'primary',
+                    '詢價中': 'info',
+                    '比價中': 'warning',
+                    '核准中': 'secondary',
+                    '已下單': 'success',
+                    '驗收中': 'dark',
+                    '已完成': 'success',
+                    '已取消': 'danger'
+                };
+                return colorMap[status] || 'secondary';
+            }
+
+            getAmountLevelColor(level) {
+                const colorMap = {
+                    '小額採購': 'success',
+                    '一般採購': 'warning',
+                    '重大採購': 'danger'
+                };
+                return colorMap[level] || 'secondary';
+            }
+
+            getRatingColor(rating) {
+                const colorMap = {
+                    'A': 'success',
+                    'B': 'warning',
+                    'C': 'danger'
+                };
+                return colorMap[rating] || 'secondary';
+            }
+
+            // 篩選功能
+            applyFilters() {
+                if (currentPage === 'purchase-orders') {
+                    const statusFilter = document.getElementById('statusFilter')?.value || '';
+                    const amountLevelFilter = document.getElementById('amountLevelFilter')?.value || '';
+                    const searchInput = document.getElementById('searchInput')?.value || '';
+                    
+                    const filters = {
+                        status: statusFilter,
+                        amountLevel: amountLevelFilter,
+                        search: searchInput
+                    };
+                    
+                    this.loadPurchaseOrders(filters);
+                }
+            }
+        }
+
+        // ===== 全域函數 =====
+        
+        // 顯示頁面的全域函數
+        function showPage(pageName) {
+            if (window.purchaseApp) {
+                window.purchaseApp.showPage(pageName);
+            }
+        }
+
+        // 新增採購案
+        async function submitNewPurchase() {
+            const form = document.getElementById('newPurchaseForm');
+            const formData = new FormData(form);
+            
+            const purchaseData = {
+                requestingDept: document.getElementById('requestingDept').value,
+                requestingPerson: document.getElementById('requestingPerson').value,
+                category: document.getElementById('category').value,
+                itemName: document.getElementById('itemName').value,
+                specification: document.getElementById('specification').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                estimatedAmount: parseFloat(document.getElementById('estimatedAmount').value)
+            };
+
+            // 驗證必填欄位
+            if (!purchaseData.requestingDept || !purchaseData.requestingPerson || 
+                !purchaseData.category || !purchaseData.itemName || 
+                !purchaseData.specification || !purchaseData.quantity || 
+                !purchaseData.estimatedAmount) {
+                api.showError('請填寫所有必填欄位');
+                return;
+            }
+
+            try {
+                // 這裡應該調用實際的 API
+                // const result = await api.createPurchaseOrder(purchaseData);
+                
+                // 模擬成功回應
+                api.showSuccess('採購案已成功建立');
+                
+                // 關閉模態視窗
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newPurchaseModal'));
+                modal.hide();
+                
+                // 清空表單
+                form.reset();
+                
+                // 重新載入採購案件列表
+                if (currentPage === 'purchase-orders') {
+                    window.purchaseApp.loadPurchaseOrders();
+                }
+                
+            } catch (error) {
+                api.showError('建立採購案失敗：' + error.message);
+            }
+        }
+
+        // 新增廠商
+        async function submitNewVendor() {
+            const form = document.getElementById('newVendorForm');
+            
+            const vendorData = {
+                name: document.getElementById('vendorName').value,
+                taxId: document.getElementById('taxId').value,
+                contact: document.getElementById('contact').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                category: document.getElementById('vendorCategory').value
+            };
+
+            // 驗證必填欄位
+            if (!vendorData.name || !vendorData.taxId || !vendorData.contact || 
+                !vendorData.phone || !vendorData.email || !vendorData.address || 
+                !vendorData.category) {
+                api.showError('請填寫所有必填欄位');
+                return;
+            }
+
+            // 驗證統一編號格式
+            if (!/^\d{8}$/.test(vendorData.taxId)) {
+                api.showError('統一編號格式不正確，請輸入8位數字');
+                return;
+            }
+
+            // 驗證電子郵件格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(vendorData.email)) {
+                api.showError('電子郵件格式不正確');
+                return;
+            }
+
+            try {
+                // 這裡應該調用實際的 API
+                // const result = await api.addVendor(vendorData);
+                
+                // 模擬成功回應
+                api.showSuccess('廠商已成功新增');
+                
+                // 關閉模態視窗
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newVendorModal'));
+                modal.hide();
+                
+                // 清空表單
+                form.reset();
+                
+                // 重新載入廠商列表
+                if (currentPage === 'vendors') {
+                    window.purchaseApp.loadVendors();
+                }
+                
+            } catch (error) {
+                api.showError('新增廠商失敗：' + error.message);
+            }
+        }
+
+        // 查看採購案詳情
+        function viewPurchaseOrder(purchaseId) {
+            // 這裡可以開啟詳情模態視窗或跳轉到詳情頁面
+            console.log('查看採購案:', purchaseId);
+            api.showSuccess(`查看採購案 ${purchaseId} 的詳細資訊`);
+        }
+
+        // 編輯採購案
+        function editPurchaseOrder(purchaseId) {
+            // 這裡可以開啟編輯模態視窗
+            console.log('編輯採購案:', purchaseId);
+            api.showSuccess(`編輯採購案 ${purchaseId}`);
+        }
+
+        // 查看廠商詳情
+        function viewVendor(vendorId) {
+            console.log('查看廠商:', vendorId);
+            api.showSuccess(`查看廠商 ${vendorId} 的詳細資訊`);
+        }
+
+        // 編輯廠商
+        function editVendor(vendorId) {
+            console.log('編輯廠商:', vendorId);
+            api.showSuccess(`編輯廠商 ${vendorId}`);
+        }
+
+        // 查看報價詳情
+        function viewQuotation(quotationId) {
+            console.log('查看報價:', quotationId);
+            api.showSuccess(`查看報價 ${quotationId} 的詳細資訊`);
+        }
+
+        // 選擇得標廠商
+        function selectWinner(quotationId) {
+            if (confirm('確定要選擇此報價為得標廠商嗎？')) {
+                console.log('選擇得標廠商:', quotationId);
+                api.showSuccess(`已選擇報價 ${quotationId} 為得標廠商`);
+                
+                // 重新載入報價列表
+                if (currentPage === 'quotations') {
+                    window.purchaseApp.loadQuotations();
+                }
+            }
+        }
+
+        // 格式化金額顯示
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('zh-TW', { 
+                style: 'currency', 
+                currency: 'TWD' 
+            }).format(amount);
+        }
+
+        // 格式化日期顯示
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('zh-TW');
+        }
+
+        // 下載報表
+        function downloadReport(reportType) {
+            console.log('下載報表:', reportType);
+            api.showSuccess(`正在準備 ${reportType} 報表下載...`);
+        }
+
+        // 匯出資料
+        function exportData(dataType) {
+            console.log('匯出資料:', dataType);
+            api.showSuccess(`正在匯出 ${dataType} 資料...`);
+        }
+
+        // 列印功能
+        function printPage() {
+            window.print();
+        }
+
+        // 響應式側邊欄切換（手機版）
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 頁面載入完成後初始化應用程式
+        document.addEventListener('DOMContentLoaded', function() {
+            // 建立全域應用程式實例
+            window.purchaseApp = new PurchaseApp();
+            
+            // 為手機版添加側邊欄切換按鈕
+            if (window.innerWidth <= 768) {
+                const content = document.getElementById('content');
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'btn btn-primary position-fixed';
+                toggleBtn.style.cssText = 'top: 10px; left: 10px; z-index: 1001;';
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                toggleBtn.onclick = toggleSidebar;
+                content.appendChild(toggleBtn);
+            }
+
+            // 監聽視窗大小變化
+            window.addEventListener('resize', function() {
+                // 重新調整圖表大小
+                Object.values(charts).forEach(chart => {
+                    if (chart && typeof chart.resize === 'function') {
+                        chart.resize();
+                    }
+                });
+            });
+
+            // 添加鍵盤快捷鍵支援
+            document.addEventListener('keydown', function(e) {
+                // Ctrl + N: 新增採購案
+                if (e.ctrlKey && e.key === 'n' && currentPage === 'purchase-orders') {
+                    e.preventDefault();
+                    const modal = new bootstrap.Modal(document.getElementById('newPurchaseModal'));
+                    modal.show();
+                }
+                
+                // Ctrl + F: 聚焦搜尋框
+                if (e.ctrlKey && e.key === 'f' && currentPage === 'purchase-orders') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                }
+                
+                // ESC: 關閉模態視窗
+                if (e.key === 'Escape') {
+                    const openModals = document.querySelectorAll('.modal.show');
+                    openModals.forEach(modal => {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
+                    });
+                }
+            });
+
+            // 添加表單驗證樣式
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
+            });
+
+            // 自動保存表單資料到 localStorage（避免意外關閉頁面時資料遺失）
+            const formInputs = document.querySelectorAll('input, textarea, select');
+            formInputs.forEach(input => {
+                // 載入已保存的資料
+                const savedValue = localStorage.getItem(`form_${input.id}`);
+                if (savedValue && input.type !== 'password') {
+                    input.value = savedValue;
+                }
+                
+                // 監聽輸入變化並保存
+                input.addEventListener('input', function() {
+                    if (input.type !== 'password') {
+                        localStorage.setItem(`form_${input.id}`, input.value);
+                    }
+                });
+            });
+
+            // 清除表單自動保存資料的函數
+            window.clearFormData = function(formId) {
+                const form = document.getElementById(formId);
+                if (form) {
+                    const inputs = form.querySelectorAll('input, textarea, select');
+                    inputs.forEach(input => {
+                        localStorage.removeItem(`form_${input.id}`);
+                    });
+                }
+            };
+
+            console.log('昶青實業採購課系統已初始化完成');
+        });
+
+        // 錯誤處理
+        window.addEventListener('error', function(e) {
+            console.error('系統錯誤:', e.error);
+            api.showError('系統發生錯誤，請重新整理頁面或聯絡系統管理員');
+        });
+
+        // 網路狀態監控
+        window.addEventListener('online', function() {
+            api.showSuccess('網路連線已恢復');
+        });
+
+        window.addEventListener('offline', function() {
+            api.showError('網路連線中斷，部分功能可能無法使用');
+        });
+    </script>
+</body>
+</html>
+
+
