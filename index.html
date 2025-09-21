@@ -1186,44 +1186,153 @@
             }
 
             // ===== 儀表板相關方法 =====
-// 更新儀表板載入函數
-async loadDashboard() {
-    try {
-        console.log('載入儀表板資料...');
-        
-        // 顯示載入狀態
-        this.showLoadingState();
-        
-        // 載入實際的儀表板資料
-        const response = await api.getDashboardData();
-        
-        if (response.success) {
-            const dashboardData = response.data;
+// 錯誤處理改進
+    async loadDashboard() {
+        try {
+            console.log('載入儀表板資料...');
             
-            // 更新統計卡片
-            this.updateStatCards(dashboardData);
+            // 顯示載入狀態
+            this.showLoadingState();
             
-            // 初始化所有圖表
-            this.initAllCharts(dashboardData);
+            // 載入實際的儀表板資料
+            const response = await api.getDashboardData();
             
-            // 更新統計摘要
-            this.updateSummaryStats(dashboardData.summary);
+            if (response.success) {
+                const dashboardData = response.data;
+                
+                // 檢查資料是否為空
+                if (!dashboardData || dashboardData.totalOrders === 0) {
+                    this.showEmptyState();
+                    return;
+                }
+                
+                // 更新統計卡片
+                this.updateStatCards(dashboardData);
+                
+                // 初始化所有圖表
+                this.initAllCharts(dashboardData);
+                
+                // 更新統計摘要
+                this.updateSummaryStats(dashboardData.summary);
+                
+                // 更新最後更新時間
+                document.getElementById('lastUpdated').textContent = 
+                    new Date(dashboardData.lastUpdated).toLocaleString('zh-TW');
+                
+                // 載入最新採購案件
+                await this.loadRecentOrdersFromAPI();
+                
+            } else {
+                throw new Error(response.message);
+            }
             
-            // 更新最後更新時間
-            document.getElementById('lastUpdated').textContent = 
-                new Date(dashboardData.lastUpdated).toLocaleString('zh-TW');
-            
-            // 載入最新採購案件
-            await this.loadRecentOrdersFromAPI();
-            
-        } else {
-            throw new Error(response.message);
+        } catch (error) {
+            console.error('載入儀表板資料失敗:', error);
+            api.showError('載入儀表板資料失敗: ' + error.message);
+            this.showErrorState();
         }
+    }
+            // 新增空狀態顯示
+    showEmptyState() {
+        const emptyHtml = '<span class="text-muted">暫無資料</span>';
         
-    } catch (error) {
-        console.error('載入儀表板資料失敗:', error);
-        api.showError('載入儀表板資料失敗: ' + error.message);
-        this.showErrorState();
+        document.getElementById('totalOrders').innerHTML = emptyHtml;
+        document.getElementById('monthlyOrders').innerHTML = emptyHtml;
+        document.getElementById('totalUntaxedAmount').innerHTML = emptyHtml;
+        document.getElementById('totalTaxedAmount').innerHTML = emptyHtml;
+        document.getElementById('monthlyUntaxedAmount').innerHTML = emptyHtml;
+        document.getElementById('monthlyTaxedAmount').innerHTML = emptyHtml;
+        document.getElementById('vendorCount').innerHTML = emptyHtml;
+        document.getElementById('departmentCount').innerHTML = emptyHtml;
+        document.getElementById('avgUnitPrice').innerHTML = emptyHtml;
+        document.getElementById('categoryCount').innerHTML = emptyHtml;
+        
+        // 顯示空圖表
+        this.initEmptyCharts();
+        
+        // 顯示空的統計摘要
+        document.getElementById('summaryStats').innerHTML = 
+            '<div class="col-12 text-center text-muted">暫無統計資料</div>';
+    }
+            // 初始化空圖表
+    initEmptyCharts() {
+        const emptyData = {
+            labels: [],
+            data: []
+        };
+        
+        this.initDepartmentChart(emptyData);
+        this.initCategoryChart(emptyData);
+        this.initSubcategoryChart(emptyData);
+        this.initVendorChart(emptyData);
+        this.initTypeChart(emptyData);
+        this.initAmountLevelChart(emptyData);
+        this.initMonthlyTrendChart([]);
+    }
+
+    // 改進的錯誤處理
+    async loadRecentOrdersFromAPI() {
+        const tbody = document.querySelector('#recentOrdersTable tbody');
+        tbody.innerHTML = '<tr><td colspan="13" class="text-center">載入中...</td></tr>';
+        
+        try {
+            const response = await api.get('getRecentOrders', { limit: 10 });
+            
+            if (response.success) {
+                const orders = response.data;
+                tbody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">暫無資料</td></tr>';
+                    return;
+                }
+                
+                orders.forEach(order => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${order.itemNo || '-'}</td>
+                        <td>${this.formatDate(order.purchaseDate)}</td>
+                        <td>${order.purchaseCode || '-'}</td>
+                        <td>${order.department || '-'}</td>
+                        <td>${order.category || '-'}</td>
+                        <td>${order.subcategory || '-'}</td>
+                        <td title="${order.specification || ''}">${this.truncateText(order.itemName, 20)}</td>
+                        <td>${order.quantity || '-'}</td>
+                        <td>${order.unit || '-'}</td>
+                        <td>${this.formatCurrency(order.untaxedAmount)}</td>
+                        <td>${this.formatCurrency(order.taxedAmount)}</td>
+                        <td>${order.vendor || '-'}</td>
+                        <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel || '-'}</span></td>
+                    `;
+                });
+            } else {
+                throw new Error(response.message);
+            }
+            
+        } catch (error) {
+            console.error('載入最新採購案件失敗:', error);
+            tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">載入失敗，請檢查網路連線或聯絡系統管理員</td></tr>';
+        }
+    }
+}
+// 全域函數 - 重新整理儀表板
+async function refreshDashboard() {
+    if (window.purchaseApp) {
+        await window.purchaseApp.loadDashboard();
+    }
+}
+
+// 全域函數 - 載入最新採購案件
+async function loadRecentOrdersFromAPI() {
+    if (window.purchaseApp) {
+        await window.purchaseApp.loadRecentOrdersFromAPI();
+    }
+}
+
+// 全域函數 - 匯出最新採購案件
+function exportRecentOrders() {
+    if (window.purchaseApp) {
+        window.purchaseApp.exportRecentOrders();
     }
 }
 
@@ -1600,78 +1709,80 @@ initAmountLevelChart(amountLevelData) {
     }
 }
 
-// 月度趨勢圖
-initMonthlyTrendChart(monthlyData) {
-    const ctx = document.getElementById('monthlyTrendChart');
-    if (ctx) {
-        if (charts.monthlyTrend) charts.monthlyTrend.destroy();
-        
-        const labels = monthlyData.map(item => item.monthName);
-        const counts = monthlyData.map(item => item.count);
-        const untaxedAmounts = monthlyData.map(item => item.untaxedAmount / 1000); // 轉換為千元
-        const taxedAmounts = monthlyData.map(item => item.taxedAmount / 1000); // 轉換為千元
-        
-        charts.monthlyTrend = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '採購案件數',
-                    data: counts,
-                    borderColor: '#FF6384',
-                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                    yAxisID: 'y',
-                    tension: 0.4
-                }, {
-                    label: '未稅金額 (千元)',
-                    data: untaxedAmounts,
-                    borderColor: '#36A2EB',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                    yAxisID: 'y1',
-                    tension: 0.4
-                }, {
-                    label: '含稅金額 (千元)',
-                    data: taxedAmounts,
-                    borderColor: '#4BC0C0',
-                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                    yAxisID: 'y1',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
+// 修正月度趨勢圖的雙軸設定
+    initMonthlyTrendChart(monthlyData) {
+        const ctx = document.getElementById('monthlyTrendChart');
+        if (ctx) {
+            if (charts.monthlyTrend) charts.monthlyTrend.destroy();
+            
+            const labels = monthlyData.map(item => item.monthName);
+            const counts = monthlyData.map(item => item.count);
+            const untaxedAmounts = monthlyData.map(item => item.untaxedAmount / 1000);
+            const taxedAmounts = monthlyData.map(item => item.taxedAmount / 1000);
+            
+            charts.monthlyTrend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '採購案件數',
+                        data: counts,
+                        borderColor: '#FF6384',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: '未稅金額 (千元)',
+                        data: untaxedAmounts,
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }, {
+                        label: '含稅金額 (千元)',
+                        data: taxedAmounts,
+                        borderColor: '#4BC0C0',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    y: { 
-                        type: 'linear', 
-                        display: true, 
-                        position: 'left',
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: '案件數'
-                        }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
                     },
-                    y1: { 
-                        type: 'linear', 
-                        display: true, 
-                        position: 'right',
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: '金額 (千元)'
+                    scales: {
+                        y: { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'left',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '案件數'
+                            }
                         },
-                        grid: { drawOnChartArea: false }
+                        y1: { 
+                            type: 'linear', 
+                            display: true, 
+                            position: 'right',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '金額 (千元)'
+                            },
+                            grid: { 
+                                drawOnChartArea: false 
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
-}
 
 // 更新統計摘要
 updateSummaryStats(summary) {
