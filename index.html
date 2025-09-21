@@ -10,6 +10,77 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <style>
+        /* 儀表板專用樣式 */
+.stat-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 10px;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stat-card .card-body {
+    padding: 1.5rem;
+}
+
+.stat-card .fa-2x {
+    opacity: 0.8;
+}
+
+/* 圖表容器樣式 */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+}
+
+/* 表格樣式 */
+.table-responsive {
+    border-radius: 8px;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+/* 載入動畫 */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .stat-card .h4 {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card .fa-2x {
+        font-size: 1.5em;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
         /* ===== CSS 樣式 ===== */
         :root {
             --primary-color: #2c3e50;
@@ -241,196 +312,258 @@
 
             <!-- 主要內容區域 -->
             <div id="content" class="content">
-                <!-- 儀表板頁面 -->
                 <div id="dashboardPage" class="page-content">
-                    <div class="container-fluid">
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h2><i class="fas fa-tachometer-alt me-2"></i>儀表板</h2>
-                                <p class="text-muted">採購課系統總覽</p>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2><i class="fas fa-tachometer-alt me-2"></i>採購管理儀表板</h2>
+                <p class="text-muted">即時採購數據分析與統計</p>
+            </div>
+        </div>
+        
+        <!-- 統計卡片 -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-primary border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-shopping-cart fa-2x text-primary"></i>
                             </div>
-                        </div>
-                        
-                        <!-- 統計卡片 -->
-                        <div class="row mb-4">
-                            <div class="col-md-3 mb-3">
-                                <div class="card stat-card text-center">
-                                    <div class="card-body">
-                                        <i class="fas fa-file-alt fa-2x text-primary mb-2"></i>
-                                        <h5 class="card-title">本月採購案件</h5>
-                                        <h3 class="text-primary" id="monthlyOrders">-</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card stat-card text-center">
-                                    <div class="card-body">
-                                        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
-                                        <h5 class="card-title">待處理案件</h5>
-                                        <h3 class="text-warning" id="pendingOrders">-</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card stat-card text-center">
-                                    <div class="card-body">
-                                        <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
-                                        <h5 class="card-title">本月採購金額</h5>
-                                        <h3 class="text-success" id="monthlyAmount">-</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card stat-card text-center">
-                                    <div class="card-body">
-                                        <i class="fas fa-building fa-2x text-info mb-2"></i>
-                                        <h5 class="card-title">合格廠商數</h5>
-                                        <h3 class="text-info" id="vendorCount">-</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 圖表區域 -->
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5><i class="fas fa-chart-pie me-2"></i>採購金額分級統計</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="amountLevelChart" style="max-height: 300px;"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5><i class="fas fa-chart-donut me-2"></i>採購狀態分布</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="statusChart" style="max-height: 300px;"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 最新採購案件 -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5><i class="fas fa-list me-2"></i>最新採購案件</h5>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="showPage('purchase-orders')">
-                                            查看全部
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover" id="recentOrdersTable">
-                                                <thead class="table-dark">
-                                                    <tr>
-                                                        <th>採購編號</th>
-                                                        <th>請購日期</th>
-                                                        <th>請購單位</th>
-                                                        <th>採購項目</th>
-                                                        <th>預估金額</th>
-                                                        <th>狀態</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td colspan="6" class="text-center">載入中...</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">總採購項目</div>
+                                <div class="h4 mb-0" id="totalOrders">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- 採購管理頁面 -->
-                <div id="purchaseOrdersPage" class="page-content d-none">
-                    <div class="container-fluid">
-                        <div class="row mb-4">
-                            <div class="col-md-8">
-                                <h2><i class="fas fa-file-invoice me-2"></i>採購管理</h2>
-                                <p class="text-muted">管理所有採購案件</p>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-success border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-calendar-check fa-2x text-success"></i>
                             </div>
-                            <div class="col-md-4 text-end">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPurchaseModal">
-                                    <i class="fas fa-plus me-2"></i>新增採購案
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 篩選器 -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <select class="form-select" id="statusFilter">
-                                            <option value="">所有狀態</option>
-                                            <option value="請購中">請購中</option>
-                                            <option value="詢價中">詢價中</option>
-                                            <option value="比價中">比價中</option>
-                                            <option value="核准中">核准中</option>
-                                            <option value="已下單">已下單</option>
-                                            <option value="驗收中">驗收中</option>
-                                            <option value="已完成">已完成</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <select class="form-select" id="amountLevelFilter">
-                                            <option value="">所有金額級別</option>
-                                            <option value="小額採購">小額採購</option>
-                                            <option value="一般採購">一般採購</option>
-                                            <option value="重大採購">重大採購</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control" id="searchInput" placeholder="搜尋採購編號或項目名稱">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <button class="btn btn-outline-secondary w-100" onclick="applyFilters()">
-                                            <i class="fas fa-search me-2"></i>搜尋
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 採購案件列表 -->
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover" id="purchaseOrdersTable">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>採購編號</th>
-                                                <th>請購日期</th>
-                                                <th>請購單位</th>
-                                                <th>採購項目</th>
-                                                <th>預估金額</th>
-                                                <th>金額級別</th>
-                                                <th>狀態</th>
-                                                <th>操作</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td colspan="8" class="text-center">載入中...</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">本月採購項目</div>
+                                <div class="h4 mb-0" id="monthlyOrders">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-info border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">總採購金額</div>
+                                <div class="h4 mb-0" id="totalAmount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-warning border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-building fa-2x text-warning"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">供應商數量</div>
+                                <div class="h4 mb-0" id="vendorCount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二排統計卡片 -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-secondary border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-sitemap fa-2x text-secondary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">部門數量</div>
+                                <div class="h4 mb-0" id="departmentCount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-info border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-line fa-2x text-info"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">平均採購金額</div>
+                                <div class="h4 mb-0" id="averageAmount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-success border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-money-bill-wave fa-2x text-success"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">本月採購金額</div>
+                                <div class="h4 mb-0" id="monthlyAmount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-3">
+                <div class="card stat-card text-center border-start border-primary border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-percentage fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 text-start">
+                                <div class="small text-muted">月度成長率</div>
+                                <div class="h4 mb-0" id="monthlyGrowth">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 圖表區域 -->
+        <div class="row mb-4">
+            <!-- 月度趨勢圖 -->
+            <div class="col-xl-8 mb-3">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-chart-line me-2"></i>月度採購趨勢</h5>
+                        <small class="text-muted">金額單位：萬元</small>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlyTrendChart" style="max-height: 350px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 金額分級 -->
+            <div class="col-xl-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie me-2"></i>金額分級分布</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="amountLevelChart" style="max-height: 350px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- 主要供應商 -->
+            <div class="col-xl-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-building me-2"></i>主要供應商 (Top 5)</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="supplierChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 部門採購分布 -->
+            <div class="col-xl-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-sitemap me-2"></i>部門採購分布 (Top 5)</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="departmentChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- 採購大項分布 -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar me-2"></i>採購大項分布</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="majorCategoryChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最新採購項目表格 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list me-2"></i>最新採購項目</h5>
+                        <div>
+                            <small class="text-muted me-3" id="lastUpdateTime">最後更新：載入中...</small>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshDashboard()">
+                                <i class="fas fa-sync-alt me-1"></i>重新整理
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="recentOrdersTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>項次</th>
+                                        <th>採購日期</th>
+                                        <th>採購編碼</th>
+                                        <th>部門</th>
+                                        <th>品名</th>
+                                        <th>廠商</th>
+                                        <th>含稅金額</th>
+                                        <th>金額分級</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="8" class="text-center">載入中...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- 廠商管理頁面 -->
                 <div id="vendorsPage" class="page-content d-none">
@@ -699,7 +832,7 @@
         
         // API 配置
         const API_CONFIG = {
-            baseUrl: 'https://script.google.com/macros/s/AKfycbwe9yIwmlLfTEohp9OCCNbdrgTpvs99EfWcGoYhYbnIa_ZItQ75bCSGUI7UG3y5mMNB/exec', // 請替換為實際的 GAS URL
+            baseUrl: 'https://script.google.com/macros/s/AKfycbyJH7_MSXvoL69BYYwf5_gtPANoLu_G2QbEEz7rDaEsvISe9epM_VyM6GZdRHUVYuxa/exec', // 請替換為實際的 GAS URL
         };
 
         // ===== API 服務類別 =====
@@ -998,31 +1131,528 @@
                 }
             }
 
-            // ===== 儀表板相關方法 =====
-            async loadDashboard() {
-                try {
-                    // 載入統計資料
-                    const dashboardData = await this.getMockDashboardData();
-                    
-                    document.getElementById('monthlyOrders').textContent = dashboardData.monthlyOrders;
-                    document.getElementById('pendingOrders').textContent = dashboardData.pendingOrders;
-                    document.getElementById('monthlyAmount').textContent = 
-                        new Intl.NumberFormat('zh-TW', { 
-                            style: 'currency', 
-                            currency: 'TWD' 
-                        }).format(dashboardData.monthlyAmount);
-                    document.getElementById('vendorCount').textContent = dashboardData.vendorCount;
-                    
-                    // 初始化圖表
-                    this.initDashboardCharts(dashboardData);
-                    
-                    // 載入最新採購案件
-                    await this.loadRecentOrders();
-                    
-                } catch (error) {
-                    console.error('載入儀表板資料失敗:', error);
+// 更新 PurchaseOrderManager 類別的 loadDashboard 方法
+async loadDashboard() {
+    try {
+        // 顯示載入狀態
+        this.showDashboardLoading();
+        
+        // 從 API 獲取真實資料
+        const result = await api.get('getDashboardData');
+        
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+        
+        const dashboardData = result.data;
+        
+        // 更新統計卡片
+        this.updateStatCards(dashboardData);
+        
+        // 初始化圖表
+        this.initDashboardCharts(dashboardData);
+        
+        // 載入最新採購項目
+        await this.loadRecentOrders();
+        
+        // 更新最後更新時間
+        document.getElementById('lastUpdateTime').textContent = 
+            `最後更新：${new Date(dashboardData.lastUpdated).toLocaleString('zh-TW')}`;
+        
+    } catch (error) {
+        console.error('載入儀表板資料失敗:', error);
+        this.showDashboardError(error.message);
+    }
+}
+
+updateStatCards(data) {
+    // 更新統計卡片
+    document.getElementById('totalOrders').textContent = data.totalOrders.toLocaleString();
+    document.getElementById('monthlyOrders').textContent = data.monthlyOrders.toLocaleString();
+    document.getElementById('vendorCount').textContent = data.vendorCount.toLocaleString();
+    document.getElementById('departmentCount').textContent = data.departmentCount.toLocaleString();
+    
+    // 格式化金額顯示
+    document.getElementById('totalAmount').textContent = 
+        this.formatCurrency(data.totalAmount);
+    
+    document.getElementById('monthlyAmount').textContent = 
+        this.formatCurrency(data.monthlyAmount);
+    
+    document.getElementById('averageAmount').textContent = 
+        this.formatCurrency(data.averageOrderAmount);
+    
+    // 計算月度成長率（簡化版）
+    const monthlyGrowth = data.monthlyAmount > 0 ? 
+        ((data.monthlyAmount / (data.totalAmount - data.monthlyAmount)) * 100) : 0;
+    document.getElementById('monthlyGrowth').textContent = 
+        monthlyGrowth.toFixed(1) + '%';
+}
+
+initDashboardCharts(data) {
+    // 月度趨勢圖（雙軸圖表）
+    const monthlyTrendCtx = document.getElementById('monthlyTrendChart');
+    if (monthlyTrendCtx) {
+        if (charts.monthlyTrend) {
+            charts.monthlyTrend.destroy();
+        }
+        charts.monthlyTrend = new Chart(monthlyTrendCtx, {
+            type: 'line',
+            data: {
+                labels: data.monthlyTrendLabels,
+                datasets: [{
+                    label: '採購金額 (萬元)',
+                    data: data.monthlyTrendAmounts,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }, {
+                    label: '採購項目數',
+                    data: data.monthlyTrendCounts,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return `採購金額: ${context.parsed.y.toLocaleString()} 萬元`;
+                                } else {
+                                    return `項目數: ${context.parsed.y} 項`;
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: '月份'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '金額 (萬元)'
+                        },
+                        beginAtZero: true
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '項目數'
+                        },
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
                 }
             }
+        });
+    }
+
+        // 金額分級圓餅圖
+    const amountLevelCtx = document.getElementById('amountLevelChart');
+    if (amountLevelCtx && data.amountLevelData.length > 0) {
+        if (charts.amountLevel) {
+            charts.amountLevel.destroy();
+        }
+        
+        // 為不同金額分級設定顏色
+        const colors = this.generateColors(data.amountLevelLabels.length);
+        
+        charts.amountLevel = new Chart(amountLevelCtx, {
+            type: 'doughnut',
+            data: {
+                labels: data.amountLevelLabels,
+                datasets: [{
+                    data: data.amountLevelData,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return `${context.label}: ${context.parsed} 項 (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 主要供應商長條圖
+    const supplierCtx = document.getElementById('supplierChart');
+    if (supplierCtx && data.supplierChartData.length > 0) {
+        if (charts.supplier) {
+            charts.supplier.destroy();
+        }
+        charts.supplier = new Chart(supplierCtx, {
+            type: 'bar',
+            data: {
+                labels: data.supplierChartLabels,
+                datasets: [{
+                    label: '採購金額 (元)',
+                    data: data.supplierChartData,
+                    backgroundColor: [
+                        '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'
+                    ],
+                    borderColor: [
+                        '#0056b3', '#1e7e34', '#d39e00', '#bd2130', '#545b62'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `採購金額: ${context.parsed.x.toLocaleString()} 元`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '金額 (元)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '供應商'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 部門採購分布長條圖
+    const departmentCtx = document.getElementById('departmentChart');
+    if (departmentCtx && data.departmentChartData.length > 0) {
+        if (charts.department) {
+            charts.department.destroy();
+        }
+        charts.department = new Chart(departmentCtx, {
+            type: 'bar',
+            data: {
+                labels: data.departmentChartLabels,
+                datasets: [{
+                    label: '採購金額 (元)',
+                    data: data.departmentChartData,
+                    backgroundColor: [
+                        '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997'
+                    ],
+                    borderColor: [
+                        '#138496', '#59359a', '#c42d78', '#d66300', '#1aa179'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `採購金額: ${context.parsed.x.toLocaleString()} 元`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '金額 (元)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '部門'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 採購大項分布長條圖
+    const majorCategoryCtx = document.getElementById('majorCategoryChart');
+    if (majorCategoryCtx && data.majorCategoryChartData.length > 0) {
+        if (charts.majorCategory) {
+            charts.majorCategory.destroy();
+        }
+        
+        const categoryColors = this.generateColors(data.majorCategoryChartData.length);
+        
+        charts.majorCategory = new Chart(majorCategoryCtx, {
+            type: 'bar',
+            data: {
+                labels: data.majorCategoryChartLabels,
+                datasets: [{
+                    label: '採購金額 (元)',
+                    data: data.majorCategoryChartData,
+                    backgroundColor: categoryColors,
+                    borderColor: categoryColors.map(color => this.darkenColor(color, 20)),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `採購金額: ${context.parsed.y.toLocaleString()} 元`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: '採購大項'
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '金額 (元)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// 載入最新採購項目
+async loadRecentOrders() {
+    try {
+        const result = await api.get('getRecentPurchaseOrders');
+        
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+        
+        const orders = result.data;
+        const tableBody = document.querySelector('#recentOrdersTable tbody');
+        
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8" class="text-center">無採購資料</td></tr>';
+            return;
+        }
+        
+        tableBody.innerHTML = orders.map(order => {
+            const purchaseDate = new Date(order['採購日期']);
+            const formattedDate = purchaseDate.toLocaleDateString('zh-TW');
+            const taxIncluded = parseFloat(order['含稅']) || 0;
+            
+            return `
+                <tr>
+                    <td>${order['項次'] || '-'}</td>
+                    <td>${formattedDate}</td>
+                    <td>${order['採購編碼'] || '-'}</td>
+                    <td>${order['部門'] || '-'}</td>
+                    <td title="${order['規格'] || ''}">${order['品名'] || '-'}</td>
+                    <td>${order['廠商'] || '-'}</td>
+                    <td class="text-end">${this.formatCurrency(taxIncluded)}</td>
+                    <td>
+                        <span class="badge ${this.getAmountLevelBadgeClass(order['金額分級'])}">
+                            ${order['金額分級'] || '-'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('載入最新採購項目失敗:', error);
+        const tableBody = document.querySelector('#recentOrdersTable tbody');
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">載入失敗</td></tr>';
+    }
+}
+
+// 輔助方法
+formatCurrency(amount) {
+    return new Intl.NumberFormat('zh-TW', { 
+        style: 'currency', 
+        currency: 'TWD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount || 0);
+}
+
+getAmountLevelBadgeClass(level) {
+    const levelMap = {
+        '小額採購': 'bg-success',
+        '一般採購': 'bg-warning',
+        '重大採購': 'bg-danger',
+        '巨額採購': 'bg-dark'
+    };
+    return levelMap[level] || 'bg-secondary';
+}
+
+generateColors(count) {
+    const baseColors = [
+        '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d',
+        '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997'
+    ];
+    
+    if (count <= baseColors.length) {
+        return baseColors.slice(0, count);
+    }
+    
+    // 如果需要更多顏色，生成隨機顏色
+    const colors = [...baseColors];
+    for (let i = baseColors.length; i < count; i++) {
+        colors.push(this.generateRandomColor());
+    }
+    return colors;
+}
+
+generateRandomColor() {
+    const hue = Math.floor(Math.random() * 360);
+    return `hsl(${hue}, 70%, 50%)`;
+}
+
+darkenColor(color, percent) {
+    // 簡化的顏色加深函數
+    if (color.startsWith('#')) {
+        const num = parseInt(color.slice(1), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) - amt;
+        const G = (num >> 8 & 0x00FF) - amt;
+        const B = (num & 0x0000FF) - amt;
+        return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    }
+    return color;
+}
+
+showDashboardLoading() {
+    // 顯示載入狀態
+    const statCards = document.querySelectorAll('.stat-card .h4');
+    statCards.forEach(card => {
+        card.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    });
+    
+    const tableBody = document.querySelector('#recentOrdersTable tbody');
+    if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>載入中...</td></tr>';
+    }
+}
+
+showDashboardError(message) {
+    // 顯示錯誤狀態
+    const statCards = document.querySelectorAll('.stat-card .h4');
+    statCards.forEach(card => {
+        card.textContent = '-';
+    });
+    
+    const tableBody = document.querySelector('#recentOrdersTable tbody');
+    if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">載入失敗: ${message}</td></tr>`;
+    }
+    
+    // 顯示錯誤提示
+    this.showAlert('載入儀表板資料失敗: ' + message, 'danger');
+}
+
+// 重新整理儀表板
+refreshDashboard() {
+    this.loadDashboard();
+}
+
+
 
             async getMockDashboardData() {
                 // 模擬資料，實際應該從 API 獲取
