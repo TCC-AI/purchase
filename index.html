@@ -732,11 +732,7 @@
                                     </div>
                                     <div class="card-body">
                                         <canvas id="departmentChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                        </div>
                 </div>
             </div>
         </div>
@@ -876,7 +872,7 @@
         </div>
     </div>
 
-        <script>
+    <script>
         // ===== JavaScript 代碼 =====
         
         // 全域變數
@@ -886,7 +882,7 @@
         
         // API 配置
         const API_CONFIG = {
-            baseUrl: 'https://script.google.com/macros/s/AKfycbwml_8qU23BNUO4HYx7Cb-4uig8gfnpcTJ_mo-GscEAuB-ip8x5HxQPd8GwgfK3nvz_/exec', // 請替換為實際的 GAS URL
+            baseUrl: 'https://script.google.com/macros/s/AKfycbwml_8qU23BNUO4HYx7Cb-4uig8gfnpcTJ_mo-GscEAuB-ip8x5HxQPd8GwgfK3nvz_/exec',
         };
 
         // ===== API 服務類別 =====
@@ -933,24 +929,24 @@
                     throw error;
                 }
             }
-             async getUsers() {
-        return await this.get('getUsers');
-    }
 
-    async addUser(userData) {
-        return await this.post('addUser', userData);
-    }
+            async getUsers() {
+                return await this.get('getUsers');
+            }
 
-    async updateUser(userData) {
-        return await this.post('updateUser', userData);
-    }
+            async addUser(userData) {
+                return await this.post('addUser', userData);
+            }
 
-    async deleteUser(account) {
-        return await this.post('deleteUser', { account });
-    }
+            async updateUser(userData) {
+                return await this.post('updateUser', userData);
+            }
+
+            async deleteUser(account) {
+                return await this.post('deleteUser', { account });
+            }
 
             showError(message) {
-                // 顯示錯誤訊息的通用方法
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
                 alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
@@ -960,7 +956,6 @@
                 `;
                 document.body.appendChild(alertDiv);
                 
-                // 3秒後自動移除
                 setTimeout(() => {
                     if (alertDiv.parentNode) {
                         alertDiv.parentNode.removeChild(alertDiv);
@@ -969,7 +964,6 @@
             }
 
             showSuccess(message) {
-                // 顯示成功訊息的通用方法
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
                 alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
@@ -986,7 +980,6 @@
                 }, 3000);
             }
 
-            // 具體 API 方法
             async login(userId, password) {
                 return await this.post('login', { userId, password });
             }
@@ -1043,13 +1036,9 @@
             }
 
             bindEvents() {
-                // 登入表單事件
                 document.getElementById('loginForm').addEventListener('submit', this.handleLogin.bind(this));
-                
-                // 登出按鈕事件
                 document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
                 
-                // 側邊欄導航事件
                 document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(link => {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -1058,13 +1047,11 @@
                     });
                 });
 
-                // 篩選器事件
                 document.getElementById('statusFilter')?.addEventListener('change', this.applyFilters.bind(this));
                 document.getElementById('amountLevelFilter')?.addEventListener('change', this.applyFilters.bind(this));
                 document.getElementById('searchInput')?.addEventListener('input', this.debounce(this.applyFilters.bind(this), 500));
             }
 
-            // 防抖函數
             debounce(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -1078,7 +1065,6 @@
             }
 
             checkLoginStatus() {
-                // 檢查是否已登入（可以從 localStorage 讀取）
                 const savedUser = localStorage.getItem('currentUser');
                 if (savedUser) {
                     currentUser = JSON.parse(savedUser);
@@ -1088,38 +1074,34 @@
                 }
             }
 
- // 修改 handleLogin 方法，移除模擬驗證
-async handleLogin(e) {
-    e.preventDefault();
-    
-    const userId = document.getElementById('userId').value;
-    const password = document.getElementById('password').value;
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    
-    // 顯示載入狀態
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登入中...';
-    submitBtn.disabled = true;
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const userId = document.getElementById('userId').value;
+                const password = document.getElementById('password').value;
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登入中...';
+                submitBtn.disabled = true;
 
-    try {
-        // 調用後端 API 進行登入驗證
-        const result = await api.login(userId, password);
-        
-        if (result.success) {
-            currentUser = result.data;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            this.showMainSystem();
-            api.showSuccess('登入成功！');
-        } else {
-            throw new Error(result.message);
-        }
-    } catch (error) {
-        api.showError(error.message || '登入失敗，請檢查帳號密碼');
-    } finally {
-        // 恢復按鈕狀態
-        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>登入';
-        submitBtn.disabled = false;
-    }
-}
+                try {
+                    const result = await api.login(userId, password);
+                    
+                    if (result.success) {
+                        currentUser = result.data;
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        this.showMainSystem();
+                        api.showSuccess('登入成功！');
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    api.showError(error.message || '登入失敗，請檢查帳號密碼');
+                } finally {
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>登入';
+                    submitBtn.disabled = false;
+                }
+            }
 
             handleLogout() {
                 localStorage.removeItem('currentUser');
@@ -1139,34 +1121,28 @@ async handleLogin(e) {
                 document.getElementById('mainSystem').classList.remove('d-none');
                 document.body.className = '';
                 
-                // 更新用戶資訊
                 if (currentUser) {
                     document.getElementById('userInfo').textContent = `使用者：${currentUser.name} (${currentUser.role})`;
                 }
                 
-                // 載入儀表板
                 this.showPage('dashboard');
             }
 
             showPage(pageName) {
-                // 隱藏所有頁面
                 document.querySelectorAll('.page-content').forEach(page => {
                     page.classList.add('d-none');
                 });
                 
-                // 顯示指定頁面
                 const targetPage = document.getElementById(pageName + 'Page');
                 if (targetPage) {
                     targetPage.classList.remove('d-none');
                     currentPage = pageName;
                     
-                    // 更新導航狀態
                     document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                         link.classList.remove('active');
                     });
                     document.querySelector(`[data-page="${pageName}"]`)?.classList.add('active');
                     
-                    // 載入頁面資料
                     this.loadPageData(pageName);
                 }
             }
@@ -1196,838 +1172,205 @@ async handleLogin(e) {
             }
 
             // ===== 儀表板相關方法 =====
-// 錯誤處理改進
-    async loadDashboard() {
-        try {
-            console.log('載入儀表板資料...');
-            
-            // 顯示載入狀態
-            this.showLoadingState();
-            
-            // 載入實際的儀表板資料
-            const response = await api.getDashboardData();
-            
-            if (response.success) {
-                const dashboardData = response.data;
-                
-                // 檢查資料是否為空
-                if (!dashboardData || dashboardData.totalOrders === 0) {
-                    this.showEmptyState();
-                    return;
-                }
-                
-                // 更新統計卡片
-                this.updateStatCards(dashboardData);
-                
-                // 初始化所有圖表
-                this.initAllCharts(dashboardData);
-                
-                // 更新統計摘要
-                this.updateSummaryStats(dashboardData.summary);
-                
-                // 更新最後更新時間
-                document.getElementById('lastUpdated').textContent = 
-                    new Date(dashboardData.lastUpdated).toLocaleString('zh-TW');
-                
-                // 載入最新採購案件
-                await this.loadRecentOrdersFromAPI();
-                
-            } else {
-                throw new Error(response.message);
-            }
-            
-        } catch (error) {
-            console.error('載入儀表板資料失敗:', error);
-            api.showError('載入儀表板資料失敗: ' + error.message);
-            this.showErrorState();
-        }
-    }
-            // 新增空狀態顯示
-    showEmptyState() {
-        const emptyHtml = '<span class="text-muted">暫無資料</span>';
-        
-        document.getElementById('totalOrders').innerHTML = emptyHtml;
-        document.getElementById('monthlyOrders').innerHTML = emptyHtml;
-        document.getElementById('totalUntaxedAmount').innerHTML = emptyHtml;
-        document.getElementById('totalTaxedAmount').innerHTML = emptyHtml;
-        document.getElementById('monthlyUntaxedAmount').innerHTML = emptyHtml;
-        document.getElementById('monthlyTaxedAmount').innerHTML = emptyHtml;
-        document.getElementById('vendorCount').innerHTML = emptyHtml;
-        document.getElementById('departmentCount').innerHTML = emptyHtml;
-        document.getElementById('avgUnitPrice').innerHTML = emptyHtml;
-        document.getElementById('categoryCount').innerHTML = emptyHtml;
-        
-        // 顯示空圖表
-        this.initEmptyCharts();
-        
-        // 顯示空的統計摘要
-        document.getElementById('summaryStats').innerHTML = 
-            '<div class="col-12 text-center text-muted">暫無統計資料</div>';
-    }
-            // 初始化空圖表
-    initEmptyCharts() {
-        const emptyData = {
-            labels: [],
-            data: []
-        };
-        
-        this.initDepartmentChart(emptyData);
-        this.initCategoryChart(emptyData);
-        this.initSubcategoryChart(emptyData);
-        this.initVendorChart(emptyData);
-        this.initTypeChart(emptyData);
-        this.initAmountLevelChart(emptyData);
-        this.initMonthlyTrendChart([]);
-    }
-
-    // 改進的錯誤處理
-    async loadRecentOrdersFromAPI() {
-        const tbody = document.querySelector('#recentOrdersTable tbody');
-        tbody.innerHTML = '<tr><td colspan="13" class="text-center">載入中...</td></tr>';
-        
-        try {
-            const response = await api.get('getRecentOrders', { limit: 10 });
-            
-            if (response.success) {
-                const orders = response.data;
-                tbody.innerHTML = '';
-                
-                if (orders.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">暫無資料</td></tr>';
-                    return;
-                }
-                
-                orders.forEach(order => {
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${order.itemNo || '-'}</td>
-                        <td>${this.formatDate(order.purchaseDate)}</td>
-                        <td>${order.purchaseCode || '-'}</td>
-                        <td>${order.department || '-'}</td>
-                        <td>${order.category || '-'}</td>
-                        <td>${order.subcategory || '-'}</td>
-                        <td title="${order.specification || ''}">${this.truncateText(order.itemName, 20)}</td>
-                        <td>${order.quantity || '-'}</td>
-                        <td>${order.unit || '-'}</td>
-                        <td>${this.formatCurrency(order.untaxedAmount)}</td>
-                        <td>${this.formatCurrency(order.taxedAmount)}</td>
-                        <td>${order.vendor || '-'}</td>
-                        <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel || '-'}</span></td>
-                    `;
-                });
-            } else {
-                throw new Error(response.message);
-            }
-            
-        } catch (error) {
-            console.error('載入最新採購案件失敗:', error);
-            tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">載入失敗，請檢查網路連線或聯絡系統管理員</td></tr>';
-        }
-    }
-}
-// 全域函數 - 重新整理儀表板
-async function refreshDashboard() {
-    if (window.purchaseApp) {
-        await window.purchaseApp.loadDashboard();
-    }
-}
-
-// 全域函數 - 載入最新採購案件
-async function loadRecentOrdersFromAPI() {
-    if (window.purchaseApp) {
-        await window.purchaseApp.loadRecentOrdersFromAPI();
-    }
-}
-
-// 全域函數 - 匯出最新採購案件
-function exportRecentOrders() {
-    if (window.purchaseApp) {
-        window.purchaseApp.exportRecentOrders();
-    }
-}
-
-// 顯示載入狀態
-showLoadingState() {
-    const loadingHtml = '<div class="spinner-border spinner-border-sm me-2"></div>載入中...';
-    
-    document.getElementById('totalOrders').innerHTML = loadingHtml;
-    document.getElementById('monthlyOrders').innerHTML = loadingHtml;
-    document.getElementById('totalUntaxedAmount').innerHTML = loadingHtml;
-    document.getElementById('totalTaxedAmount').innerHTML = loadingHtml;
-    document.getElementById('monthlyUntaxedAmount').innerHTML = loadingHtml;
-    document.getElementById('monthlyTaxedAmount').innerHTML = loadingHtml;
-    document.getElementById('vendorCount').innerHTML = loadingHtml;
-    document.getElementById('departmentCount').innerHTML = loadingHtml;
-    document.getElementById('avgUnitPrice').innerHTML = loadingHtml;
-    document.getElementById('categoryCount').innerHTML = loadingHtml;
-}
-
-// 更新統計卡片
-updateStatCards(dashboardData) {
-    document.getElementById('totalOrders').textContent = dashboardData.totalOrders.toLocaleString();
-    document.getElementById('monthlyOrders').textContent = dashboardData.monthlyOrders.toLocaleString();
-    document.getElementById('vendorCount').textContent = dashboardData.vendorCount.toLocaleString();
-    document.getElementById('departmentCount').textContent = dashboardData.departmentCount.toLocaleString();
-    document.getElementById('categoryCount').textContent = dashboardData.categoryCount.toLocaleString();
-    
-    // 格式化金額
-    document.getElementById('totalUntaxedAmount').textContent = 
-        new Intl.NumberFormat('zh-TW', { 
-            style: 'currency', 
-            currency: 'TWD',
-            maximumFractionDigits: 0
-        }).format(dashboardData.totalUntaxedAmount);
-        
-    document.getElementById('totalTaxedAmount').textContent = 
-        new Intl.NumberFormat('zh-TW', { 
-            style: 'currency', 
-            currency: 'TWD',
-            maximumFractionDigits: 0
-        }).format(dashboardData.totalTaxedAmount);
-        
-    document.getElementById('monthlyUntaxedAmount').textContent = 
-        new Intl.NumberFormat('zh-TW', { 
-            style: 'currency', 
-            currency: 'TWD',
-            maximumFractionDigits: 0
-        }).format(dashboardData.monthlyUntaxedAmount);
-        
-    document.getElementById('monthlyTaxedAmount').textContent = 
-        new Intl.NumberFormat('zh-TW', { 
-            style: 'currency', 
-            currency: 'TWD',
-            maximumFractionDigits: 0
-        }).format(dashboardData.monthlyTaxedAmount);
-        
-    document.getElementById('avgUnitPrice').textContent = 
-        new Intl.NumberFormat('zh-TW', { 
-            style: 'currency', 
-            currency: 'TWD',
-            maximumFractionDigits: 0
-        }).format(dashboardData.avgUnitPrice);
-}
-
-// 初始化所有圖表
-initAllCharts(dashboardData) {
-    // 部門分布圖
-    this.initDepartmentChart(dashboardData.departmentChart);
-    
-    // 採購類別分布圖
-    this.initCategoryChart(dashboardData.categoryChart);
-    
-    // 子類別統計圖
-    this.initSubcategoryChart(dashboardData.subcategoryChart);
-    
-    // 廠商統計圖
-    this.initVendorChart(dashboardData.vendorChart);
-    
-    // 採購種類圖
-    this.initTypeChart(dashboardData.typeChart);
-    
-    // 金額分級圖
-    this.initAmountLevelChart(dashboardData.amountLevelChart);
-    
-    // 月度趨勢圖
-    this.initMonthlyTrendChart(dashboardData.monthlyTrend);
-}
-
-// 部門分布圖
-initDepartmentChart(departmentData) {
-    const ctx = document.getElementById('departmentChart');
-    if (ctx) {
-        if (charts.department) charts.department.destroy();
-        
-        charts.department = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: departmentData.labels,
-                datasets: [{
-                    data: departmentData.data,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                        '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
-                        '#4BC0C0', '#36A2EB'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            padding: 15, 
-                            usePointStyle: true,
-                            font: { size: 12 }
+            async loadDashboard() {
+                try {
+                    console.log('載入儀表板資料...');
+                    
+                    this.showLoadingState();
+                    
+                    const response = await api.getDashboardData();
+                    
+                    if (response.success) {
+                        const dashboardData = response.data;
+                        
+                        if (!dashboardData || dashboardData.totalOrders === 0) {
+                            this.showEmptyState();
+                            return;
                         }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                return `${context.label}: ${context.parsed} (${percentage}%)`;
-                            }
-                        }
+                        
+                        this.updateStatCards(dashboardData);
+                        this.initAllCharts(dashboardData);
+                        this.updateSummaryStats(dashboardData.summary);
+                        
+                        document.getElementById('lastUpdated').textContent = 
+                            new Date(dashboardData.lastUpdated).toLocaleString('zh-TW');
+                        
+                        await this.loadRecentOrdersFromAPI();
+                        
+                    } else {
+                        throw new Error(response.message);
                     }
+                    
+                } catch (error) {
+                    console.error('載入儀表板資料失敗:', error);
+                    api.showError('載入儀表板資料失敗: ' + error.message);
+                    this.showErrorState();
                 }
             }
-        });
-    }
-}
 
-// 採購類別分布圖
-initCategoryChart(categoryData) {
-    const ctx = document.getElementById('categoryChart');
-    if (ctx) {
-        if (charts.category) charts.category.destroy();
-        
-        charts.category = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: categoryData.labels,
-                datasets: [{
-                    data: categoryData.data,
-                    backgroundColor: [
-                        '#28a745', '#dc3545', '#ffc107', '#007bff',
-                        '#6f42c1', '#fd7e14', '#20c997', '#6c757d'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            padding: 15, 
-                            usePointStyle: true,
-                            font: { size: 12 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                return `${context.label}: ${context.parsed} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
+            showEmptyState() {
+                const emptyHtml = '<span class="text-muted">暫無資料</span>';
+                
+                document.getElementById('totalOrders').innerHTML = emptyHtml;
+                document.getElementById('monthlyOrders').innerHTML = emptyHtml;
+                document.getElementById('totalUntaxedAmount').innerHTML = emptyHtml;
+                document.getElementById('totalTaxedAmount').innerHTML = emptyHtml;
+                document.getElementById('monthlyUntaxedAmount').innerHTML = emptyHtml;
+                document.getElementById('monthlyTaxedAmount').innerHTML = emptyHtml;
+                document.getElementById('vendorCount').innerHTML = emptyHtml;
+                document.getElementById('departmentCount').innerHTML = emptyHtml;
+                document.getElementById('avgUnitPrice').innerHTML = emptyHtml;
+                document.getElementById('categoryCount').innerHTML = emptyHtml;
+                
+                this.initEmptyCharts();
+                
+                document.getElementById('summaryStats').innerHTML = 
+                    '<div class="col-12 text-center text-muted">暫無統計資料</div>';
             }
-        });
-    }
-}
 
-// 子類別統計圖
-initSubcategoryChart(subcategoryData) {
-    const ctx = document.getElementById('subcategoryChart');
-    if (ctx) {
-        if (charts.subcategory) charts.subcategory.destroy();
-        
-        charts.subcategory = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: subcategoryData.labels,
-                datasets: [{
-                    label: '採購案件數',
-                    data: subcategoryData.data,
-                    backgroundColor: '#36A2EB',
-                    borderColor: '#1E88E5',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.parsed.y} 件`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    },
-                    x: { 
-                        ticks: { 
-                            maxRotation: 45,
-                            minRotation: 45,
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
-        });
-    }
-}
-
-// 修正廠商統計圖 - 將 'horizontalBar' 改為 'bar' 並設定 indexAxis
-initVendorChart(vendorData) {
-    const ctx = document.getElementById('vendorChart');
-    if (ctx) {
-        if (charts.vendor) charts.vendor.destroy();
-        
-        charts.vendor = new Chart(ctx, {
-            type: 'bar', // 改為 'bar'
-            data: {
-                labels: vendorData.labels,
-                datasets: [{
-                    label: '採購次數',
-                    data: vendorData.data,
-                    backgroundColor: '#4BC0C0',
-                    borderColor: '#26A69A',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y', // 設定為水平條形圖
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.parsed.x} 次`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: { 
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
-        });
-    }
-}
-
-
-// 採購種類圖
-initTypeChart(typeData) {
-    const ctx = document.getElementById('typeChart');
-    if (ctx) {
-        if (charts.type) charts.type.destroy();
-        
-        charts.type = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: typeData.labels,
-                datasets: [{
-                    data: typeData.data,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                        '#9966FF', '#FF9F40'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            padding: 15, 
-                            usePointStyle: true,
-                            font: { size: 12 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                return `${context.label}: ${context.parsed} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-}
-
-// 金額分級圖
-initAmountLevelChart(amountLevelData) {
-    const ctx = document.getElementById('amountLevelChart');
-    if (ctx) {
-        if (charts.amountLevel) charts.amountLevel.destroy();
-        
-        charts.amountLevel = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: amountLevelData.labels,
-                datasets: [{
-                    data: amountLevelData.data,
-                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#007bff'],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { 
-                            padding: 15, 
-                            usePointStyle: true,
-                            font: { size: 12 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                return `${context.label}: ${context.parsed} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-}
-
-// 修正月度趨勢圖的雙軸設定
-    initMonthlyTrendChart(monthlyData) {
-        const ctx = document.getElementById('monthlyTrendChart');
-        if (ctx) {
-            if (charts.monthlyTrend) charts.monthlyTrend.destroy();
-            
-            const labels = monthlyData.map(item => item.monthName);
-            const counts = monthlyData.map(item => item.count);
-            const untaxedAmounts = monthlyData.map(item => item.untaxedAmount / 1000);
-            const taxedAmounts = monthlyData.map(item => item.taxedAmount / 1000);
-            
-            charts.monthlyTrend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '採購案件數',
-                        data: counts,
-                        borderColor: '#FF6384',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        yAxisID: 'y',
-                        tension: 0.4
-                    }, {
-                        label: '未稅金額 (千元)',
-                        data: untaxedAmounts,
-                        borderColor: '#36A2EB',
-                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                        yAxisID: 'y1',
-                        tension: 0.4
-                    }, {
-                        label: '含稅金額 (千元)',
-                        data: taxedAmounts,
-                        borderColor: '#4BC0C0',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                        yAxisID: 'y1',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    scales: {
-                        y: { 
-                            type: 'linear', 
-                            display: true, 
-                            position: 'left',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '案件數'
-                            }
-                        },
-                        y1: { 
-                            type: 'linear', 
-                            display: true, 
-                            position: 'right',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '金額 (千元)'
-                            },
-                            grid: { 
-                                drawOnChartArea: false 
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-// 更新統計摘要
-updateSummaryStats(summary) {
-    const summaryContainer = document.getElementById('summaryStats');
-    
-    let html = '';
-    
-    // 部門統計
-    if (summary.departmentStats && Object.keys(summary.departmentStats).length > 0) {
-        html += '<div class="col-12 mb-3"><h6><i class="fas fa-building me-2"></i>部門統計</h6>';
-        const topDepartments = Object.entries(summary.departmentStats)
-            .sort(([,a], [,b]) => b - a)
-            .slice(0, 5);
-        
-        topDepartments.forEach(([dept, count]) => {
-            html += `<div class="d-flex justify-content-between">
-                <span>${dept}</span>
-                <span class="badge bg-primary">${count}</span>
-            </div>`;
-        });
-        html += '</div>';
-    }
-    
-    // 類別統計
-    if (summary.categoryStats && Object.keys(summary.categoryStats).length > 0) {
-        html += '<div class="col-12 mb-3"><h6><i class="fas fa-tags me-2"></i>採購類別統計</h6>';
-        const topCategories = Object.entries(summary.categoryStats)
-            .sort(([,a], [,b]) => b - a)
-            .slice(0, 5);
-        
-        topCategories.forEach(([category, count]) => {
-            html += `<div class="d-flex justify-content-between">
-                <span>${category}</span>
-                <span class="badge bg-success">${count}</span>
-            </div>`;
-        });
-        html += '</div>';
-    }
-    
-    // 廠商統計
-    if (summary.vendorStats && Object.keys(summary.vendorStats).length > 0) {
-        html += '<div class="col-12 mb-3"><h6><i class="fas fa-handshake me-2"></i>主要廠商</h6>';
-        const topVendors = Object.entries(summary.vendorStats)
-            .sort(([,a], [,b]) => b - a)
-            .slice(0, 5);
-        
-        topVendors.forEach(([vendor, count]) => {
-            html += `<div class="d-flex justify-content-between">
-                <span>${vendor}</span>
-                <span class="badge bg-info">${count}</span>
-            </div>`;
-        });
-        html += '</div>';
-    }
-    
-    if (html === '') {
-        html = '<div class="col-12 text-center text-muted">暫無統計資料</div>';
-    }
-    
-    summaryContainer.innerHTML = html;
-}
-
-// 載入最新採購案件
-async loadRecentOrdersFromAPI() {
-    const tbody = document.querySelector('#recentOrdersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="13" class="text-center">載入中...</td></tr>';
-    
-    try {
-        const response = await api.get('getRecentOrders', { limit: 10 });
-        
-        if (response.success) {
-            const orders = response.data;
-            tbody.innerHTML = '';
-            
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">暫無資料</td></tr>';
-                return;
-            }
-            
-            orders.forEach(order => {
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${order.itemNo || '-'}</td>
-                    <td>${this.formatDate(order.purchaseDate)}</td>
-                    <td>${order.purchaseCode || '-'}</td>
-                    <td>${order.department || '-'}</td>
-                    <td>${order.category || '-'}</td>
-                    <td>${order.subcategory || '-'}</td>
-                    <td title="${order.specification || ''}">${this.truncateText(order.itemName, 20)}</td>
-                    <td>${order.quantity || '-'}</td>
-                    <td>${order.unit || '-'}</td>
-                    <td>${this.formatCurrency(order.untaxedAmount)}</td>
-                    <td>${this.formatCurrency(order.taxedAmount)}</td>
-                    <td>${order.vendor || '-'}</td>
-                    <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel || '-'}</span></td>
-                `;
-            });
-        } else {
-            throw new Error(response.message);
-        }
-        
-    } catch (error) {
-        console.error('載入最新採購案件失敗:', error);
-        tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">載入失敗</td></tr>';
-    }
-}
-
-// 輔助函數
-formatDate(dateStr) {
-    if (!dateStr) return '-';
-    try {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('zh-TW');
-    } catch {
-        return dateStr;
-    }
-}
-
-formatCurrency(amount) {
-    if (!amount || amount === 0) return '-';
-    return new Intl.NumberFormat('zh-TW', { 
-        style: 'currency', 
-        currency: 'TWD',
-        maximumFractionDigits: 0
-    }).format(amount);
-}
-
-truncateText(text, maxLength) {
-    if (!text) return '-';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-}
-
-getAmountLevelColor(level) {
-    const colors = {
-        '小額': 'success',
-        '中額': 'warning', 
-        '大額': 'danger',
-        '特大額': 'dark'
-    };
-    return colors[level] || 'secondary';
-}
-
-// 顯示錯誤狀態
-showErrorState() {
-    const errorHtml = '<span class="text-danger">載入失敗</span>';
-    
-    document.getElementById('totalOrders').innerHTML = errorHtml;
-    document.getElementById('monthlyOrders').innerHTML = errorHtml;
-    document.getElementById('totalUntaxedAmount').innerHTML = errorHtml;
-    document.getElementById('totalTaxedAmount').innerHTML = errorHtml;
-    document.getElementById('monthlyUntaxedAmount').innerHTML = errorHtml;
-    document.getElementById('monthlyTaxedAmount').innerHTML = errorHtml;
-    document.getElementById('vendorCount').innerHTML = errorHtml;
-    document.getElementById('departmentCount').innerHTML = errorHtml;
-    document.getElementById('avgUnitPrice').innerHTML = errorHtml;
-    document.getElementById('categoryCount').innerHTML = errorHtml;
-}
-
-// 重新整理儀表板
-async refreshDashboard() {
-    await this.loadDashboard();
-}
-
-// 匯出最新採購案件
-exportRecentOrders() {
-    try {
-        const table = document.getElementById('recentOrdersTable');
-        const rows = [];
-        
-        // 取得表頭
-        const headers = [];
-        table.querySelectorAll('thead th').forEach(th => {
-            headers.push(th.textContent.trim());
-        });
-        rows.push(headers);
-        
-        // 取得資料行
-        table.querySelectorAll('tbody tr').forEach(tr => {
-            const row = [];
-            tr.querySelectorAll('td').forEach(td => {
-                row.push(td.textContent.trim());
-            });
-            if (row.length > 1) { // 排除載入中或錯誤訊息
-                rows.push(row);
-            }
-        });
-        
-        // 轉換為 CSV
-        const csvContent = rows.map(row => 
-            row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
-        ).join('\n');
-        
-        // 下載檔案
-        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `最新採購案件_${new Date().toISOString().split('T')[0]}.csv`;
-        link.click();
-        
-        api.showSuccess('匯出成功');
-        
-    } catch (error) {
-        console.error('匯出失敗:', error);
-        api.showError('匯出失敗: ' + error.message);
-    }
-}
-
-
-
-            async getMockDashboardData() {
-                // 模擬資料，實際應該從 API 獲取
-                return {
-                    monthlyOrders: 25,
-                    pendingOrders: 8,
-                    monthlyAmount: 2850000,
-                    vendorCount: 45,
-                    amountLevelData: [15, 8, 2], // 小額、一般、重大
-                    statusData: [3, 5, 2, 4, 6, 3, 2] // 各狀態數量
+            initEmptyCharts() {
+                const emptyData = {
+                    labels: [],
+                    data: []
                 };
+                
+                this.initDepartmentChart(emptyData);
+                this.initCategoryChart(emptyData);
+                this.initSubcategoryChart(emptyData);
+                this.initVendorChart(emptyData);
+                this.initTypeChart(emptyData);
+                this.initAmountLevelChart(emptyData);
+                this.initMonthlyTrendChart([]);
             }
 
-            initDashboardCharts(data) {
-                // 採購金額分級統計圖
-                const amountLevelCtx = document.getElementById('amountLevelChart');
-                if (amountLevelCtx) {
-                    if (charts.amountLevel) {
-                        charts.amountLevel.destroy();
+            async loadRecentOrdersFromAPI() {
+                const tbody = document.querySelector('#recentOrdersTable tbody');
+                tbody.innerHTML = '<tr><td colspan="13" class="text-center">載入中...</td></tr>';
+                
+                try {
+                    const response = await api.get('getRecentOrders', { limit: 10 });
+                    
+                    if (response.success) {
+                        const orders = response.data;
+                        tbody.innerHTML = '';
+                        
+                        if (orders.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">暫無資料</td></tr>';
+                            return;
+                        }
+                        
+                        orders.forEach(order => {
+                            const row = tbody.insertRow();
+                            row.innerHTML = `
+                                <td>${order.itemNo || '-'}</td>
+                                <td>${this.formatDate(order.purchaseDate)}</td>
+                                <td>${order.purchaseCode || '-'}</td>
+                                <td>${order.department || '-'}</td>
+                                <td>${order.category || '-'}</td>
+                                <td>${order.subcategory || '-'}</td>
+                                <td title="${order.specification || ''}">${this.truncateText(order.itemName, 20)}</td>
+                                <td>${order.quantity || '-'}</td>
+                                <td>${order.unit || '-'}</td>
+                                <td>${this.formatCurrency(order.untaxedAmount)}</td>
+                                <td>${this.formatCurrency(order.taxedAmount)}</td>
+                                <td>${order.vendor || '-'}</td>
+                                <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel || '-'}</span></td>
+                            `;
+                        });
+                    } else {
+                        throw new Error(response.message);
                     }
-                    charts.amountLevel = new Chart(amountLevelCtx, {
+                    
+                } catch (error) {
+                    console.error('載入最新採購案件失敗:', error);
+                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">載入失敗，請檢查網路連線或聯絡系統管理員</td></tr>';
+                }
+            }
+
+            showLoadingState() {
+                const loadingHtml = '<div class="spinner-border spinner-border-sm me-2"></div>載入中...';
+                
+                document.getElementById('totalOrders').innerHTML = loadingHtml;
+                document.getElementById('monthlyOrders').innerHTML = loadingHtml;
+                document.getElementById('totalUntaxedAmount').innerHTML = loadingHtml;
+                document.getElementById('totalTaxedAmount').innerHTML = loadingHtml;
+                document.getElementById('monthlyUntaxedAmount').innerHTML = loadingHtml;
+                document.getElementById('monthlyTaxedAmount').innerHTML = loadingHtml;
+                document.getElementById('vendorCount').innerHTML = loadingHtml;
+                document.getElementById('departmentCount').innerHTML = loadingHtml;
+                document.getElementById('avgUnitPrice').innerHTML = loadingHtml;
+                document.getElementById('categoryCount').innerHTML = loadingHtml;
+            }
+
+            updateStatCards(dashboardData) {
+                document.getElementById('totalOrders').textContent = dashboardData.totalOrders.toLocaleString();
+                document.getElementById('monthlyOrders').textContent = dashboardData.monthlyOrders.toLocaleString();
+                document.getElementById('vendorCount').textContent = dashboardData.vendorCount.toLocaleString();
+                document.getElementById('departmentCount').textContent = dashboardData.departmentCount.toLocaleString();
+                document.getElementById('categoryCount').textContent = dashboardData.categoryCount.toLocaleString();
+                
+                document.getElementById('totalUntaxedAmount').textContent = 
+                    new Intl.NumberFormat('zh-TW', { 
+                        style: 'currency', 
+                        currency: 'TWD',
+                        maximumFractionDigits: 0
+                    }).format(dashboardData.totalUntaxedAmount);
+                    
+                document.getElementById('totalTaxedAmount').textContent = 
+                    new Intl.NumberFormat('zh-TW', { 
+                        style: 'currency', 
+                        currency: 'TWD',
+                        maximumFractionDigits: 0
+                    }).format(dashboardData.totalTaxedAmount);
+                    
+                document.getElementById('monthlyUntaxedAmount').textContent = 
+                    new Intl.NumberFormat('zh-TW', { 
+                        style: 'currency', 
+                        currency: 'TWD',
+                        maximumFractionDigits: 0
+                    }).format(dashboardData.monthlyUntaxedAmount);
+                    
+                document.getElementById('monthlyTaxedAmount').textContent = 
+                    new Intl.NumberFormat('zh-TW', { 
+                        style: 'currency', 
+                        currency: 'TWD',
+                        maximumFractionDigits: 0
+                    }).format(dashboardData.monthlyTaxedAmount);
+                    
+                document.getElementById('avgUnitPrice').textContent = 
+                    new Intl.NumberFormat('zh-TW', { 
+                        style: 'currency', 
+                        currency: 'TWD',
+                        maximumFractionDigits: 0
+                    }).format(dashboardData.avgUnitPrice);
+            }
+
+            initAllCharts(dashboardData) {
+                this.initDepartmentChart(dashboardData.departmentChart);
+                this.initCategoryChart(dashboardData.categoryChart);
+                this.initSubcategoryChart(dashboardData.subcategoryChart);
+                this.initVendorChart(dashboardData.vendorChart);
+                this.initTypeChart(dashboardData.typeChart);
+                this.initAmountLevelChart(dashboardData.amountLevelChart);
+                this.initMonthlyTrendChart(dashboardData.monthlyTrend);
+            }
+
+            initDepartmentChart(departmentData) {
+                const ctx = document.getElementById('departmentChart');
+                if (ctx) {
+                    if (charts.department) charts.department.destroy();
+                    
+                    charts.department = new Chart(ctx, {
                         type: 'pie',
                         data: {
-                            labels: ['小額採購 (≤15萬)', '一般採購 (15-100萬)', '重大採購 (>100萬)'],
+                            labels: departmentData.labels,
                             datasets: [{
-                                data: data.amountLevelData,
-                                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                                data: departmentData.data,
+                                backgroundColor: [
+                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                                    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
+                                    '#4BC0C0', '#36A2EB'
+                                ],
                                 borderWidth: 2,
                                 borderColor: '#fff'
                             }]
@@ -2038,31 +1381,41 @@ exportRecentOrders() {
                             plugins: {
                                 legend: {
                                     position: 'bottom',
-                                    labels: {
-                                        padding: 20,
-                                        usePointStyle: true
+                                    labels: { 
+                                        padding: 15, 
+                                        usePointStyle: true,
+                                        font: { size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
                                     }
                                 }
                             }
                         }
                     });
                 }
+            }
 
-                // 採購狀態分布圖
-                const statusCtx = document.getElementById('statusChart');
-                if (statusCtx) {
-                    if (charts.status) {
-                        charts.status.destroy();
-                    }
-                    charts.status = new Chart(statusCtx, {
+            initCategoryChart(categoryData) {
+                const ctx = document.getElementById('categoryChart');
+                if (ctx) {
+                    if (charts.category) charts.category.destroy();
+                    
+                    charts.category = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
-                            labels: ['請購中', '詢價中', '比價中', '核准中', '已下單', '驗收中', '已完成'],
+                            labels: categoryData.labels,
                             datasets: [{
-                                data: data.statusData,
+                                data: categoryData.data,
                                 backgroundColor: [
-                                    '#007bff', '#6c757d', '#28a745', 
-                                    '#ffc107', '#fd7e14', '#e83e8c', '#20c997'
+                                    '#28a745', '#dc3545', '#ffc107', '#007bff',
+                                    '#6f42c1', '#fd7e14', '#20c997', '#6c757d'
                                 ],
                                 borderWidth: 2,
                                 borderColor: '#fff'
@@ -2074,9 +1427,19 @@ exportRecentOrders() {
                             plugins: {
                                 legend: {
                                     position: 'bottom',
-                                    labels: {
-                                        padding: 15,
-                                        usePointStyle: true
+                                    labels: { 
+                                        padding: 15, 
+                                        usePointStyle: true,
+                                        font: { size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
                                     }
                                 }
                             }
@@ -2085,375 +1448,84 @@ exportRecentOrders() {
                 }
             }
 
-            async loadRecentOrders() {
-                const tbody = document.querySelector('#recentOrdersTable tbody');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">載入中...</td></tr>';
-                
-                try {
-                    const orders = await this.getMockPurchaseOrders(5); // 獲取最新 5 筆
-                    tbody.innerHTML = '';
+            initSubcategoryChart(subcategoryData) {
+                const ctx = document.getElementById('subcategoryChart');
+                if (ctx) {
+                    if (charts.subcategory) charts.subcategory.destroy();
                     
-                    if (orders.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">暫無資料</td></tr>';
-                        return;
-                    }
-                    
-                    orders.forEach(order => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td>${order.purchaseId}</td>
-                            <td>${new Date(order.requestDate).toLocaleDateString('zh-TW')}</td>
-                            <td>${order.requestingDept}</td>
-                            <td>${order.itemName}</td>
-                            <td>${new Intl.NumberFormat('zh-TW', { 
-                                style: 'currency', 
-                                currency: 'TWD' 
-                            }).format(order.estimatedAmount)}</td>
-                            <td><span class="badge bg-${this.getStatusColor(order.status)}">${order.status}</span></td>
-                        `;
-                    });
-                } catch (error) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">載入失敗</td></tr>';
-                }
-            }
-
-            // ===== 採購管理相關方法 =====
-            async loadPurchaseOrders(filters = {}) {
-                const tbody = document.querySelector('#purchaseOrdersTable tbody');
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">載入中...</td></tr>';
-                
-                try {
-                    const orders = await this.getMockPurchaseOrders();
-                    tbody.innerHTML = '';
-                    
-                    if (orders.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
-                        return;
-                    }
-                    
-                    orders.forEach(order => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td>${order.purchaseId}</td>
-                            <td>${new Date(order.requestDate).toLocaleDateString('zh-TW')}</td>
-                            <td>${order.requestingDept}</td>
-                            <td>${order.itemName}</td>
-                            <td>${new Intl.NumberFormat('zh-TW', { 
-                                style: 'currency', 
-                                currency: 'TWD' 
-                            }).format(order.estimatedAmount)}</td>
-                            <td><span class="badge bg-${this.getAmountLevelColor(order.amountLevel)}">${order.amountLevel}</span></td>
-                            <td><span class="badge bg-${this.getStatusColor(order.status)}">${order.status}</span></td>
-                            <td>
-                                <div class="btn-group-actions">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="viewPurchaseOrder('${order.purchaseId}')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="editPurchaseOrder('${order.purchaseId}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
-                    });
-                } catch (error) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">載入失敗</td></tr>';
-                }
-            }
-
-            async getMockPurchaseOrders(limit = null) {
-                // 模擬採購案件資料
-                const mockData = [
-                    {
-                        purchaseId: 'PO20250919001',
-                        requestDate: '2025-09-19',
-                        requestingDept: '資訊部',
-                        requestingPerson: '張小明',
-                        category: '設備',
-                        itemName: '伺服器設備',
-                        estimatedAmount: 850000,
-                        amountLevel: '一般採購',
-                        status: '詢價中'
-                    },
-                    {
-                        purchaseId: 'PO20250918002',
-                        requestDate: '2025-09-18',
-                        requestingDept: '行政部',
-                        requestingPerson: '李小華',
-                        category: '服務',
-                        itemName: '辦公室清潔服務',
-                        estimatedAmount: 120000,
-                        amountLevel: '小額採購',
-                        status: '已完成'
-                    },
-                    {
-                        purchaseId: 'PO20250917003',
-                        requestDate: '2025-09-17',
-                        requestingDept: '工程部',
-                        requestingPerson: '王大明',
-                        category: '工程',
-                        itemName: '廠房改建工程',
-                        estimatedAmount: 1500000,
-                        amountLevel: '重大採購',
-                        status: '核准中'
-                    },
-                    {
-                        purchaseId: 'PO20250916004',
-                        requestDate: '2025-09-16',
-                        requestingDept: '研發部',
-                        requestingPerson: '陳小美',
-                        category: '設備',
-                        itemName: '實驗室設備',
-                        estimatedAmount: 650000,
-                        amountLevel: '一般採購',
-                        status: '比價中'
-                    },
-                    {
-                        purchaseId: 'PO20250915005',
-                        requestDate: '2025-09-15',
-                        requestingDept: '總務部',
-                        requestingPerson: '劉小強',
-                        category: '其他',
-                        itemName: '辦公用品',
-                        estimatedAmount: 85000,
-                        amountLevel: '小額採購',
-                        status: '已下單'
-                    }
-                ];
-                
-                return limit ? mockData.slice(0, limit) : mockData;
-            }
-
-            // ===== 廠商管理相關方法 =====
-            async loadVendors() {
-                const tbody = document.querySelector('#vendorsTable tbody');
-                tbody.innerHTML = '<tr><td colspan="9" class="text-center">載入中...</td></tr>';
-                
-                try {
-                    const vendors = await this.getMockVendors();
-                    tbody.innerHTML = '';
-                    
-                    if (vendors.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">暫無資料</td></tr>';
-                        return;
-                    }
-                    
-                    vendors.forEach(vendor => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td>${vendor.vendorId}</td>
-                            <td>${vendor.name}</td>
-                            <td>${vendor.taxId}</td>
-                            <td>${vendor.contact}</td>
-                            <td>${vendor.phone}</td>
-                            <td>${vendor.category}</td>
-                            <td><span class="badge bg-${this.getRatingColor(vendor.rating)}">${vendor.rating}</span></td>
-                            <td><span class="badge bg-${vendor.status === '合格' ? 'success' : 'danger'}">${vendor.status}</span></td>
-                            <td>
-                                <div class="btn-group-actions">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="viewVendor('${vendor.vendorId}')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="editVendor('${vendor.vendorId}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        `;
-                    });
-                } catch (error) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">載入失敗</td></tr>';
-                }
-            }
-
-            async getMockVendors() {
-                // 模擬廠商資料
-                return [
-                    {
-                        vendorId: 'V001',
-                        name: '台灣科技股份有限公司',
-                        taxId: '12345678',
-                        contact: '張經理',
-                        phone: '02-1234-5678',
-                        category: '設備供應商',
-                        rating: 'A',
-                        status: '合格'
-                    },
-                    {
-                        vendorId: 'V002',
-                        name: '優質服務有限公司',
-                        taxId: '87654321',
-                        contact: '李主任',
-                        phone: '02-8765-4321',
-                        category: '服務提供商',
-                        rating: 'B',
-                        status: '合格'
-                    },
-                    {
-                        vendorId: 'V003',
-                        name: '建築工程股份有限公司',
-                        taxId: '11223344',
-                        contact: '王工程師',
-                        phone: '02-1122-3344',
-                        category: '工程承包商',
-                        rating: 'A',
-                        status: '合格'
-                    }
-                ];
-            }
-
-            // ===== 報價管理相關方法 =====
-            async loadQuotations() {
-                const tbody = document.querySelector('#quotationsTable tbody');
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">載入中...</td></tr>';
-                
-                try {
-                    const quotations = await this.getMockQuotations();
-                    tbody.innerHTML = '';
-                    
-                    if (quotations.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
-                        return;
-                    }
-                    
-                    quotations.forEach(quotation => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td>${quotation.quotationId}</td>
-                            <td>${quotation.purchaseId}</td>
-                            <td>${quotation.vendorName}</td>
-                            <td>${new Intl.NumberFormat('zh-TW', { 
-                                style: 'currency', 
-                                currency: 'TWD' 
-                            }).format(quotation.quotedAmount)}</td>
-                            <td>${quotation.deliveryDays} 天</td>
-                            <td>${new Date(quotation.quotationDate).toLocaleDateString('zh-TW')}</td>
-                            <td><span class="badge bg-${quotation.isWinning ? 'success' : 'secondary'}">${quotation.isWinning ? '得標' : '未得標'}</span></td>
-                            <td>
-                                <div class="btn-group-actions">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="viewQuotation('${quotation.quotationId}')">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    ${!quotation.isWinning ? `<button class="btn btn-sm btn-outline-success" onclick="selectWinner('${quotation.quotationId}')">
-                                        <i class="fas fa-check"></i>
-                                    </button>` : ''}
-                                </div>
-                            </td>
-                        `;
-                    });
-                } catch (error) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">載入失敗</td></tr>';
-                }
-            }
-
-            async getMockQuotations() {
-                // 模擬報價資料
-                return [
-                    {
-                        quotationId: 'Q001',
-                        purchaseId: 'PO20250919001',
-                        vendorName: '台灣科技股份有限公司',
-                        quotedAmount: 820000,
-                        deliveryDays: 30,
-                        quotationDate: '2025-09-19',
-                        isWinning: false
-                    },
-                    {
-                        quotationId: 'Q002',
-                        purchaseId: 'PO20250919001',
-                        vendorName: '另一家科技公司',
-                        quotedAmount: 850000,
-                        deliveryDays: 25,
-                        quotationDate: '2025-09-19',
-                        isWinning: false
-                    },
-                    {
-                        quotationId: 'Q003',
-                        purchaseId: 'PO20250918002',
-                        vendorName: '優質服務有限公司',
-                        quotedAmount: 115000,
-                        deliveryDays: 7,
-                        quotationDate: '2025-09-18',
-                        isWinning: true
-                    }
-                ];
-            }
-
-            // ===== 報表分析相關方法 =====
-            async loadReports() {
-                // 初始化報表圖表
-                this.initReportCharts();
-            }
-
-            initReportCharts() {
-                // 月度採購趨勢圖
-                const monthlyTrendCtx = document.getElementById('monthlyTrendChart');
-                if (monthlyTrendCtx) {
-                    if (charts.monthlyTrend) {
-                        charts.monthlyTrend.destroy();
-                    }
-                    charts.monthlyTrend = new Chart(monthlyTrendCtx, {
-                        type: 'line',
+                    charts.subcategory = new Chart(ctx, {
+                        type: 'bar',
                         data: {
-                            labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月'],
+                            labels: subcategoryData.labels,
                             datasets: [{
-                                label: '採購金額 (萬元)',
-                                data: [150, 200, 180, 220, 190, 250, 280, 260, 285],
-                                borderColor: '#007bff',
-                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                }
-
-                // 部門採購統計圖
-                const departmentCtx = document.getElementById('departmentChart');
-                if (departmentCtx) {
-                    if (charts.department) {
-                        charts.department.destroy();
-                    }
-                    charts.department = new Chart(departmentCtx, {                        type: 'bar',
-                        data: {
-                            labels: ['資訊部', '工程部', '研發部', '行政部', '總務部'],
-                            datasets: [{
-                                label: '採購金額 (萬元)',
-                                data: [85, 150, 65, 45, 35],
-                                backgroundColor: [
-                                    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'
-                                ],
-                                borderColor: [
-                                    '#0056b3', '#1e7e34', '#d39e00', '#bd2130', '#545b62'
-                                ],
+                                label: '採購案件數',
+                                data: subcategoryData.data,
+                                backgroundColor: '#36A2EB',
+                                borderColor: '#1E88E5',
                                 borderWidth: 1
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.label}: ${context.parsed.y} 件`;
+                                        }
+                                    }
                                 }
                             },
                             scales: {
-                                y: {
-                                    beginAtZero: true
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                                                    }
+                            }
+                        }
+                    });
+                }
+            }
+
+            initVendorChart(vendorData) {
+                const ctx = document.getElementById('vendorChart');
+                if (ctx) {
+                    if (charts.vendor) charts.vendor.destroy();
+                    
+                    charts.vendor = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: vendorData.labels,
+                            datasets: [{
+                                label: '採購案件數',
+                                data: vendorData.data,
+                                backgroundColor: '#28a745',
+                                borderColor: '#20c997',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.label}: ${context.parsed.y} 件`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
                                 }
                             }
                         }
@@ -2461,369 +1533,595 @@ exportRecentOrders() {
                 }
             }
 
+            initTypeChart(typeData) {
+                const ctx = document.getElementById('typeChart');
+                if (ctx) {
+                    if (charts.type) charts.type.destroy();
+                    
+                    charts.type = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: typeData.labels,
+                            datasets: [{
+                                data: typeData.data,
+                                backgroundColor: [
+                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                    '#9966FF', '#FF9F40'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { 
+                                        padding: 15, 
+                                        usePointStyle: true,
+                                        font: { size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            initAmountLevelChart(amountLevelData) {
+                const ctx = document.getElementById('amountLevelChart');
+                if (ctx) {
+                    if (charts.amountLevel) charts.amountLevel.destroy();
+                    
+                    charts.amountLevel = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: amountLevelData.labels,
+                            datasets: [{
+                                data: amountLevelData.data,
+                                backgroundColor: [
+                                    '#28a745', '#ffc107', '#fd7e14', '#dc3545'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#fff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { 
+                                        padding: 15, 
+                                        usePointStyle: true,
+                                        font: { size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            initMonthlyTrendChart(monthlyData) {
+                const ctx = document.getElementById('monthlyTrendChart');
+                if (ctx) {
+                    if (charts.monthlyTrend) charts.monthlyTrend.destroy();
+                    
+                    charts.monthlyTrend = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: monthlyData.map(item => item.month),
+                            datasets: [{
+                                label: '採購案件數',
+                                data: monthlyData.map(item => item.count),
+                                borderColor: '#36A2EB',
+                                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }, {
+                                label: '採購金額 (萬元)',
+                                data: monthlyData.map(item => Math.round(item.amount / 10000)),
+                                borderColor: '#FF6384',
+                                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y1'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        font: { size: 12 }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: '月份'
+                                    }
+                                },
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: '採購案件數'
+                                    },
+                                    beginAtZero: true
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: '採購金額 (萬元)'
+                                    },
+                                    beginAtZero: true,
+                                    grid: {
+                                        drawOnChartArea: false,
+                                    },
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            updateSummaryStats(summaryData) {
+                const summaryContainer = document.getElementById('summaryStats');
+                if (!summaryData) {
+                    summaryContainer.innerHTML = '<div class="col-12 text-center text-muted">暫無統計資料</div>';
+                    return;
+                }
+
+                summaryContainer.innerHTML = `
+                    <div class="col-12">
+                        <h6>採購統計摘要</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>最大單筆金額：</span>
+                            <strong>${this.formatCurrency(summaryData.maxAmount)}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>最小單筆金額：</span>
+                            <strong>${this.formatCurrency(summaryData.minAmount)}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>平均採購金額：</span>
+                            <strong>${this.formatCurrency(summaryData.avgAmount)}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>最活躍部門：</span>
+                            <strong>${summaryData.topDepartment}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>最大供應商：</span>
+                            <strong>${summaryData.topVendor}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>資料更新時間：</span>
+                            <strong>${this.formatDateTime(summaryData.lastUpdate)}</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ===== 其他頁面載入方法 =====
+            async loadPurchaseOrders() {
+                try {
+                    const response = await api.getPurchaseOrders();
+                    if (response.success) {
+                        this.renderPurchaseOrdersTable(response.data);
+                    } else {
+                        throw new Error(response.message);
+                    }
+                } catch (error) {
+                    console.error('載入採購單失敗:', error);
+                    api.showError('載入採購單失敗');
+                }
+            }
+
+            async loadVendors() {
+                try {
+                    const response = await api.getVendors();
+                    if (response.success) {
+                        this.renderVendorsTable(response.data);
+                    } else {
+                        throw new Error(response.message);
+                    }
+                } catch (error) {
+                    console.error('載入廠商資料失敗:', error);
+                    api.showError('載入廠商資料失敗');
+                }
+            }
+
+            async loadQuotations() {
+                try {
+                    const response = await api.getQuotations();
+                    if (response.success) {
+                        this.renderQuotationsTable(response.data);
+                    } else {
+                        throw new Error(response.message);
+                    }
+                } catch (error) {
+                    console.error('載入報價資料失敗:', error);
+                    api.showError('載入報價資料失敗');
+                }
+            }
+
+            async loadReports() {
+                try {
+                    const response = await api.getReports('monthly');
+                    if (response.success) {
+                        this.renderReports(response.data);
+                    } else {
+                        throw new Error(response.message);
+                    }
+                } catch (error) {
+                    console.error('載入報表失敗:', error);
+                    api.showError('載入報表失敗');
+                }
+            }
+
+            // ===== 表格渲染方法 =====
+            renderPurchaseOrdersTable(orders) {
+                const tbody = document.querySelector('#purchaseOrdersTable tbody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${order.purchaseId}</td>
+                        <td>${this.formatDate(order.requestDate)}</td>
+                        <td>${order.requestingDept}</td>
+                        <td>${order.itemName}</td>
+                        <td>${this.formatCurrency(order.estimatedAmount)}</td>
+                        <td><span class="badge bg-${this.getStatusColor(order.status)}">${order.status}</span></td>
+                        <td>${order.requestingPerson}</td>
+                        <td>
+                            <div class="btn-group-actions">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewPurchaseOrder('${order.purchaseId}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editPurchaseOrder('${order.purchaseId}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                });
+            }
+
+            renderVendorsTable(vendors) {
+                const tbody = document.querySelector('#vendorsTable tbody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                
+                if (vendors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">暫無資料</td></tr>';
+                    return;
+                }
+
+                vendors.forEach(vendor => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${vendor.vendorId}</td>
+                        <td>${vendor.vendorName}</td>
+                        <td>${vendor.taxId}</td>
+                        <td>${vendor.contact}</td>
+                        <td>${vendor.phone}</td>
+                        <td>${vendor.category}</td>
+                        <td><span class="badge bg-${this.getRatingColor(vendor.rating)}">${vendor.rating}</span></td>
+                        <td><span class="badge bg-${vendor.status === '啟用' ? 'success' : 'secondary'}">${vendor.status}</span></td>
+                        <td>
+                            <div class="btn-group-actions">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewVendor('${vendor.vendorId}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editVendor('${vendor.vendorId}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                });
+            }
+
+            renderQuotationsTable(quotations) {
+                const tbody = document.querySelector('#quotationsTable tbody');
+                if (!tbody) return;
+
+                tbody.innerHTML = '';
+                
+                if (quotations.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">暫無資料</td></tr>';
+                    return;
+                }
+
+                quotations.forEach(quotation => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${quotation.quotationId}</td>
+                        <td>${quotation.purchaseId}</td>
+                        <td>${quotation.vendorName}</td>
+                        <td>${this.formatCurrency(quotation.quotedAmount)}</td>
+                        <td>${quotation.deliveryDate}</td>
+                        <td>${this.formatDate(quotation.quotationDate)}</td>
+                        <td><span class="badge bg-${quotation.isWinner ? 'success' : 'secondary'}">${quotation.isWinner ? '得標' : '未得標'}</span></td>
+                        <td>
+                            <div class="btn-group-actions">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewQuotation('${quotation.quotationId}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                });
+            }
+
             // ===== 工具方法 =====
+            formatCurrency(amount) {
+                if (amount == null || amount === '') return '-';
+                return new Intl.NumberFormat('zh-TW', {
+                    style: 'currency',
+                    currency: 'TWD',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            formatDate(dateString) {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('zh-TW');
+            }
+
+            formatDateTime(dateString) {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return date.toLocaleString('zh-TW');
+            }
+
+            truncateText(text, maxLength) {
+                if (!text) return '-';
+                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+            }
+
             getStatusColor(status) {
                 const colorMap = {
-                    '請購中': 'primary',
-                    '詢價中': 'info',
-                    '比價中': 'warning',
-                    '核准中': 'secondary',
-                    '已下單': 'success',
-                    '驗收中': 'dark',
-                    '已完成': 'success',
+                    '待審核': 'warning',
+                    '已核准': 'success',
+                    '進行中': 'info',
+                    '已完成': 'primary',
                     '已取消': 'danger'
                 };
                 return colorMap[status] || 'secondary';
             }
 
-            getAmountLevelColor(level) {
-                const colorMap = {
-                    '小額採購': 'success',
-                    '一般採購': 'warning',
-                    '重大採購': 'danger'
-                };
-                return colorMap[level] || 'secondary';
-            }
-
             getRatingColor(rating) {
                 const colorMap = {
                     'A': 'success',
-                    'B': 'warning',
-                    'C': 'danger'
+                    'B': 'info',
+                    'C': 'warning',
+                    'D': 'danger'
                 };
                 return colorMap[rating] || 'secondary';
             }
 
-            // 篩選功能
-            applyFilters() {
-                if (currentPage === 'purchase-orders') {
-                    const statusFilter = document.getElementById('statusFilter')?.value || '';
-                    const amountLevelFilter = document.getElementById('amountLevelFilter')?.value || '';
-                    const searchInput = document.getElementById('searchInput')?.value || '';
-                    
-                    const filters = {
-                        status: statusFilter,
-                        amountLevel: amountLevelFilter,
-                        search: searchInput
-                    };
-                    
-                    this.loadPurchaseOrders(filters);
-                }
+            getAmountLevelColor(level) {
+                const colorMap = {
+                    '小額': 'success',
+                    '中額': 'warning',
+                    '大額': 'danger',
+                    '巨額': 'dark'
+                };
+                return colorMap[level] || 'secondary';
+            }
+
+            showErrorState() {
+                const errorHtml = '<span class="text-danger">載入失敗</span>';
+                
+                document.getElementById('totalOrders').innerHTML = errorHtml;
+                document.getElementById('monthlyOrders').innerHTML = errorHtml;
+                document.getElementById('totalUntaxedAmount').innerHTML = errorHtml;
+                document.getElementById('totalTaxedAmount').innerHTML = errorHtml;
+                document.getElementById('monthlyUntaxedAmount').innerHTML = errorHtml;
+                document.getElementById('monthlyTaxedAmount').innerHTML = errorHtml;
+                document.getElementById('vendorCount').innerHTML = errorHtml;
+                document.getElementById('departmentCount').innerHTML = errorHtml;
+                document.getElementById('avgUnitPrice').innerHTML = errorHtml;
+                document.getElementById('categoryCount').innerHTML = errorHtml;
+                
+                document.getElementById('summaryStats').innerHTML = 
+                    '<div class="col-12 text-center text-danger">載入統計資料失敗</div>';
             }
         }
 
         // ===== 全域函數 =====
-        
-        // 顯示頁面的全域函數
-        function showPage(pageName) {
-            if (window.purchaseApp) {
-                window.purchaseApp.showPage(pageName);
+        function refreshDashboard() {
+            if (app) {
+                app.loadDashboard();
             }
         }
 
-        // 新增採購案
+        function exportRecentOrders() {
+            // 匯出最新採購案件功能
+            const table = document.getElementById('recentOrdersTable');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            
+            let csv = '';
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('th, td'));
+                const rowData = cells.map(cell => `"${cell.textContent.trim()}"`).join(',');
+                csv += rowData + '\n';
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `最新採購案件_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         async function submitNewPurchase() {
             const form = document.getElementById('newPurchaseForm');
             const formData = new FormData(form);
             
             const purchaseData = {
-                requestingDept: document.getElementById('requestingDept').value,
-                requestingPerson: document.getElementById('requestingPerson').value,
-                category: document.getElementById('category').value,
-                itemName: document.getElementById('itemName').value,
-                specification: document.getElementById('specification').value,
-                quantity: parseInt(document.getElementById('quantity').value),
-                estimatedAmount: parseFloat(document.getElementById('estimatedAmount').value)
+                requestingDept: formData.get('requestingDept'),
+                requestingPerson: formData.get('requestingPerson'),
+                category: formData.get('category'),
+                estimatedAmount: parseFloat(formData.get('estimatedAmount')),
+                itemName: formData.get('itemName'),
+                specification: formData.get('specification'),
+                quantity: parseInt(formData.get('quantity'))
             };
 
-            // 驗證必填欄位
-            if (!purchaseData.requestingDept || !purchaseData.requestingPerson || 
-                !purchaseData.category || !purchaseData.itemName || 
-                !purchaseData.specification || !purchaseData.quantity || 
-                !purchaseData.estimatedAmount) {
-                api.showError('請填寫所有必填欄位');
-                return;
-            }
-
             try {
-                // 這裡應該調用實際的 API
-                // const result = await api.createPurchaseOrder(purchaseData);
-                
-                // 模擬成功回應
-                api.showSuccess('採購案已成功建立');
-                
-                // 關閉模態視窗
-                const modal = bootstrap.Modal.getInstance(document.getElementById('newPurchaseModal'));
-                modal.hide();
-                
-                // 清空表單
-                form.reset();
-                
-                // 重新載入採購案件列表
-                if (currentPage === 'purchase-orders') {
-                    window.purchaseApp.loadPurchaseOrders();
+                const response = await api.createPurchaseOrder(purchaseData);
+                if (response.success) {
+                    api.showSuccess('採購案建立成功！');
+                    bootstrap.Modal.getInstance(document.getElementById('newPurchaseModal')).hide();
+                    form.reset();
+                    if (currentPage === 'purchase-orders') {
+                        app.loadPurchaseOrders();
+                    }
+                } else {
+                    throw new Error(response.message);
                 }
-                
             } catch (error) {
                 api.showError('建立採購案失敗：' + error.message);
             }
         }
 
-        // 新增廠商
         async function submitNewVendor() {
             const form = document.getElementById('newVendorForm');
+            const formData = new FormData(form);
             
             const vendorData = {
-                name: document.getElementById('vendorName').value,
-                taxId: document.getElementById('taxId').value,
-                contact: document.getElementById('contact').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                address: document.getElementById('address').value,
-                category: document.getElementById('vendorCategory').value
+                vendorName: formData.get('vendorName'),
+                taxId: formData.get('taxId'),
+                contact: formData.get('contact'),
+                phone: formData.get('phone'),
+                email: formData.get('email'),
+                address: formData.get('address'),
+                category: formData.get('vendorCategory')
             };
 
-            // 驗證必填欄位
-            if (!vendorData.name || !vendorData.taxId || !vendorData.contact || 
-                !vendorData.phone || !vendorData.email || !vendorData.address || 
-                !vendorData.category) {
-                api.showError('請填寫所有必填欄位');
-                return;
-            }
-
-            // 驗證統一編號格式
-            if (!/^\d{8}$/.test(vendorData.taxId)) {
-                api.showError('統一編號格式不正確，請輸入8位數字');
-                return;
-            }
-
-            // 驗證電子郵件格式
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(vendorData.email)) {
-                api.showError('電子郵件格式不正確');
-                return;
-            }
-
             try {
-                // 這裡應該調用實際的 API
-                // const result = await api.addVendor(vendorData);
-                
-                // 模擬成功回應
-                api.showSuccess('廠商已成功新增');
-                
-                // 關閉模態視窗
-                const modal = bootstrap.Modal.getInstance(document.getElementById('newVendorModal'));
-                modal.hide();
-                
-                // 清空表單
-                form.reset();
-                
-                // 重新載入廠商列表
-                if (currentPage === 'vendors') {
-                    window.purchaseApp.loadVendors();
+                const response = await api.addVendor(vendorData);
+                if (response.success) {
+                    api.showSuccess('廠商新增成功！');
+                    bootstrap.Modal.getInstance(document.getElementById('newVendorModal')).hide();
+                    form.reset();
+                    if (currentPage === 'vendors') {
+                        app.loadVendors();
+                    }
+                } else {
+                    throw new Error(response.message);
                 }
-                
             } catch (error) {
                 api.showError('新增廠商失敗：' + error.message);
             }
         }
 
-        // 查看採購案詳情
-        function viewPurchaseOrder(purchaseId) {
-            // 這裡可以開啟詳情模態視窗或跳轉到詳情頁面
-            console.log('查看採購案:', purchaseId);
-            api.showSuccess(`查看採購案 ${purchaseId} 的詳細資訊`);
+        // 其他操作函數
+        function viewPurchaseOrder(orderId) {
+            console.log('查看採購單:', orderId);
+            // 實作查看採購單詳情
         }
 
-        // 編輯採購案
-        function editPurchaseOrder(purchaseId) {
-            // 這裡可以開啟編輯模態視窗
-            console.log('編輯採購案:', purchaseId);
-            api.showSuccess(`編輯採購案 ${purchaseId}`);
+        function editPurchaseOrder(orderId) {
+            console.log('編輯採購單:', orderId);
+            // 實作編輯採購單
         }
 
-        // 查看廠商詳情
         function viewVendor(vendorId) {
             console.log('查看廠商:', vendorId);
-            api.showSuccess(`查看廠商 ${vendorId} 的詳細資訊`);
+            // 實作查看廠商詳情
         }
 
-        // 編輯廠商
         function editVendor(vendorId) {
             console.log('編輯廠商:', vendorId);
-            api.showSuccess(`編輯廠商 ${vendorId}`);
+            // 實作編輯廠商
         }
 
-        // 查看報價詳情
         function viewQuotation(quotationId) {
             console.log('查看報價:', quotationId);
-            api.showSuccess(`查看報價 ${quotationId} 的詳細資訊`);
+            // 實作查看報價詳情
         }
 
-        // 選擇得標廠商
-        function selectWinner(quotationId) {
-            if (confirm('確定要選擇此報價為得標廠商嗎？')) {
-                console.log('選擇得標廠商:', quotationId);
-                api.showSuccess(`已選擇報價 ${quotationId} 為得標廠商`);
-                
-                // 重新載入報價列表
-                if (currentPage === 'quotations') {
-                    window.purchaseApp.loadQuotations();
-                }
-            }
-        }
-
-        // 格式化金額顯示
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('zh-TW', { 
-                style: 'currency', 
-                currency: 'TWD' 
-            }).format(amount);
-        }
-
-        // 格式化日期顯示
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('zh-TW');
-        }
-
-        // 下載報表
-        function downloadReport(reportType) {
-            console.log('下載報表:', reportType);
-            api.showSuccess(`正在準備 ${reportType} 報表下載...`);
-        }
-
-        // 匯出資料
-        function exportData(dataType) {
-            console.log('匯出資料:', dataType);
-            api.showSuccess(`正在匯出 ${dataType} 資料...`);
-        }
-
-        // 列印功能
-        function printPage() {
-            window.print();
-        }
-
-        // 響應式側邊欄切換（手機版）
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('show');
-        }
-
-        // 頁面載入完成後初始化應用程式
+        // ===== 應用程式初始化 =====
+        let app;
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // 建立全域應用程式實例
-            window.purchaseApp = new PurchaseApp();
-            
-            // 為手機版添加側邊欄切換按鈕
-            if (window.innerWidth <= 768) {
-                const content = document.getElementById('content');
-                const toggleBtn = document.createElement('button');
-                toggleBtn.className = 'btn btn-primary position-fixed';
-                toggleBtn.style.cssText = 'top: 10px; left: 10px; z-index: 1001;';
-                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                toggleBtn.onclick = toggleSidebar;
-                content.appendChild(toggleBtn);
-            }
-
-            // 監聽視窗大小變化
-            window.addEventListener('resize', function() {
-                // 重新調整圖表大小
-                Object.values(charts).forEach(chart => {
-                    if (chart && typeof chart.resize === 'function') {
-                        chart.resize();
-                    }
-                });
-            });
-
-            // 添加鍵盤快捷鍵支援
-            document.addEventListener('keydown', function(e) {
-                // Ctrl + N: 新增採購案
-                if (e.ctrlKey && e.key === 'n' && currentPage === 'purchase-orders') {
-                    e.preventDefault();
-                    const modal = new bootstrap.Modal(document.getElementById('newPurchaseModal'));
-                    modal.show();
-                }
-                
-                // Ctrl + F: 聚焦搜尋框
-                if (e.ctrlKey && e.key === 'f' && currentPage === 'purchase-orders') {
-                    e.preventDefault();
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) {
-                        searchInput.focus();
-                    }
-                }
-                
-                // ESC: 關閉模態視窗
-                if (e.key === 'Escape') {
-                    const openModals = document.querySelectorAll('.modal.show');
-                    openModals.forEach(modal => {
-                        const bsModal = bootstrap.Modal.getInstance(modal);
-                        if (bsModal) {
-                            bsModal.hide();
-                        }
-                    });
-                }
-            });
-
-            // 添加表單驗證樣式
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    if (!form.checkValidity()) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
-            });
-
-            // 自動保存表單資料到 localStorage（避免意外關閉頁面時資料遺失）
-            const formInputs = document.querySelectorAll('input, textarea, select');
-            formInputs.forEach(input => {
-                // 載入已保存的資料
-                const savedValue = localStorage.getItem(`form_${input.id}`);
-                if (savedValue && input.type !== 'password') {
-                    input.value = savedValue;
-                }
-                
-                // 監聽輸入變化並保存
-                input.addEventListener('input', function() {
-                    if (input.type !== 'password') {
-                        localStorage.setItem(`form_${input.id}`, input.value);
-                    }
-                });
-            });
-
-            // 清除表單自動保存資料的函數
-            window.clearFormData = function(formId) {
-                const form = document.getElementById(formId);
-                if (form) {
-                    const inputs = form.querySelectorAll('input, textarea, select');
-                    inputs.forEach(input => {
-                        localStorage.removeItem(`form_${input.id}`);
-                    });
-                }
-            };
-
-            console.log('昶青實業採購課系統已初始化完成');
+            console.log('DOM載入完成，初始化應用程式...');
+            app = new PurchaseApp();
         });
 
-        // 錯誤處理
+        // ===== 錯誤處理 =====
         window.addEventListener('error', function(e) {
-            console.error('系統錯誤:', e.error);
-            api.showError('系統發生錯誤，請重新整理頁面或聯絡系統管理員');
+            console.error('全域錯誤:', e.error);
+            if (api) {
+                api.showError('系統發生錯誤，請重新整理頁面或聯絡系統管理員');
+            }
         });
 
-        // 網路狀態監控
-        window.addEventListener('online', function() {
-            api.showSuccess('網路連線已恢復');
-        });
-
-        window.addEventListener('offline', function() {
-            api.showError('網路連線中斷，部分功能可能無法使用');
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('未處理的Promise拒絕:', e.reason);
+            if (api) {
+                api.showError('系統發生錯誤，請重新整理頁面或聯絡系統管理員');
+            }
         });
     </script>
 </body>
 </html>
 
 
+                
