@@ -1449,46 +1449,47 @@
             }
 
             initSubcategoryChart(subcategoryData) {
-                const ctx = document.getElementById('subcategoryChart');
-                if (ctx) {
-                    if (charts.subcategory) charts.subcategory.destroy();
-                    
-                    charts.subcategory = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: subcategoryData.labels,
-                            datasets: [{
-                                label: '採購案件數',
-                                data: subcategoryData.data,
-                                backgroundColor: '#36A2EB',
-                                borderColor: '#1E88E5',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { 
-                                legend: { display: false },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `${context.label}: ${context.parsed.y} 件`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: { 
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                                                    }
+    const ctx = document.getElementById('subcategoryChart');
+    if (ctx) {
+        if (charts.subcategory) charts.subcategory.destroy();
+        
+        charts.subcategory = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: subcategoryData.labels,
+                datasets: [{
+                    label: '採購案件數',
+                    data: subcategoryData.data,
+                    backgroundColor: '#36A2EB',
+                    borderColor: '#1E88E5',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.parsed.y} 件`;
                             }
                         }
-                    });
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
                 }
             }
+        });
+    }
+}
 
             initVendorChart(vendorData) {
                 const ctx = document.getElementById('vendorChart');
