@@ -886,7 +886,7 @@
         
         // API 配置
         const API_CONFIG = {
-            baseUrl: 'https://script.google.com/macros/s/AKfycbzP08KnS56oEDvn-qYFGTVx7u0z_Wb-S3XyKWuzyHONpDuMP3QOAyDqsoAqQJlQAkHY/exec', // 請替換為實際的 GAS URL
+            baseUrl: 'https://script.google.com/macros/s/AKfycbwml_8qU23BNUO4HYx7Cb-4uig8gfnpcTJ_mo-GscEAuB-ip8x5HxQPd8GwgfK3nvz_/exec', // 請替換為實際的 GAS URL
         };
 
         // ===== API 服務類別 =====
@@ -933,6 +933,21 @@
                     throw error;
                 }
             }
+             async getUsers() {
+        return await this.get('getUsers');
+    }
+
+    async addUser(userData) {
+        return await this.post('addUser', userData);
+    }
+
+    async updateUser(userData) {
+        return await this.post('updateUser', userData);
+    }
+
+    async deleteUser(account) {
+        return await this.post('deleteUser', { account });
+    }
 
             showError(message) {
                 // 顯示錯誤訊息的通用方法
@@ -1073,43 +1088,38 @@
                 }
             }
 
-            async handleLogin(e) {
-                e.preventDefault();
-                
-                const userId = document.getElementById('userId').value;
-                const password = document.getElementById('password').value;
-                const submitBtn = e.target.querySelector('button[type="submit"]');
-                
-                // 顯示載入狀態
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登入中...';
-                submitBtn.disabled = true;
+ // 修改 handleLogin 方法，移除模擬驗證
+async handleLogin(e) {
+    e.preventDefault();
+    
+    const userId = document.getElementById('userId').value;
+    const password = document.getElementById('password').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    // 顯示載入狀態
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登入中...';
+    submitBtn.disabled = true;
 
-                try {
-                    // 模擬登入驗證（實際應該調用 API）
-                    if (userId && password) {
-                        // 模擬用戶資料
-                        currentUser = {
-                            id: userId,
-                            name: userId === 'admin' ? '系統管理員' : userId,
-                            department: '採購課',
-                            role: userId === 'admin' ? '主任' : '組員',
-                            permissions: userId === 'admin' ? ['all'] : ['read', 'create']
-                        };
-                        
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        this.showMainSystem();
-                        api.showSuccess('登入成功！');
-                    } else {
-                        throw new Error('請輸入帳號和密碼');
-                    }
-                } catch (error) {
-                    api.showError(error.message || '登入失敗，請檢查帳號密碼');
-                } finally {
-                    // 恢復按鈕狀態
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>登入';
-                    submitBtn.disabled = false;
-                }
-            }
+    try {
+        // 調用後端 API 進行登入驗證
+        const result = await api.login(userId, password);
+        
+        if (result.success) {
+            currentUser = result.data;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            this.showMainSystem();
+            api.showSuccess('登入成功！');
+        } else {
+            throw new Error(result.message);
+        }
+    } catch (error) {
+        api.showError(error.message || '登入失敗，請檢查帳號密碼');
+    } finally {
+        // 恢復按鈕狀態
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>登入';
+        submitBtn.disabled = false;
+    }
+}
 
             handleLogout() {
                 localStorage.removeItem('currentUser');
