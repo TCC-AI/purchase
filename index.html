@@ -886,7 +886,7 @@
         
         // API 配置
         const API_CONFIG = {
-            baseUrl: 'https://script.google.com/macros/s/AKfycbw4SH-PS6rY4c_nLxcA14o-zYuecnFaEoOd_krUUWQhoYTOFYjxbxWJPxEFkt9MkgGz/exec', // 請替換為實際的 GAS URL
+            baseUrl: 'https://script.google.com/macros/s/AKfycbzP08KnS56oEDvn-qYFGTVx7u0z_Wb-S3XyKWuzyHONpDuMP3QOAyDqsoAqQJlQAkHY/exec', // 請替換為實際的 GAS URL
         };
 
         // ===== API 服務類別 =====
@@ -1458,14 +1458,14 @@ initSubcategoryChart(subcategoryData) {
     }
 }
 
-// 廠商統計圖
+// 修正廠商統計圖 - 將 'horizontalBar' 改為 'bar' 並設定 indexAxis
 initVendorChart(vendorData) {
     const ctx = document.getElementById('vendorChart');
     if (ctx) {
         if (charts.vendor) charts.vendor.destroy();
         
         charts.vendor = new Chart(ctx, {
-            type: 'horizontalBar',
+            type: 'bar', // 改為 'bar'
             data: {
                 labels: vendorData.labels,
                 datasets: [{
@@ -1477,6 +1477,7 @@ initVendorChart(vendorData) {
                 }]
             },
             options: {
+                indexAxis: 'y', // 設定為水平條形圖
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
@@ -1495,12 +1496,18 @@ initVendorChart(vendorData) {
                         ticks: {
                             stepSize: 1
                         }
+                    },
+                    y: {
+                        ticks: {
+                            font: { size: 10 }
+                        }
                     }
                 }
             }
         });
     }
 }
+
 
 // 採購種類圖
 initTypeChart(typeData) {
